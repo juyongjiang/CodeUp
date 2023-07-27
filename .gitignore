@@ -1,0 +1,15 @@
+out/
+7B/
+13B/
+__pycache__/
+checkpoint**
+minimal-llama**
+upload.py
+lora-**
+*ckpt
+evaluate.py
+test_data.json
+todo.txt
+.venv
+.vscode
+.DS_Store
