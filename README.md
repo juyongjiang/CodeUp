@@ -10,10 +10,10 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Overview
-In recent years, large language models (LLMs) have shown exceptional capabilities in a wide range of applications due to their amazing emergence ability. To align with human preference, instruction-tuning and reinforcement learning from human feedback (RLHF) are proposed for Chat-based LLMs (e.g., ChatGPT, GPT-4). However, these LLMs (except Codex) primiarily focus on the general domain and do not specifically design for the code domain. Despite Codex provides an alternative choice, it is a closed-source model developed by OpenAI. Hence, it is imperative to develop open-source instruction-following LLMs for code domain. 
-However, the large-scale number of LLMs' parameters (>7B) and training datasets require a vast amount of computational resources, which significantly impedes the development of training and inference on consumer hardware. 
+In recent years, large language models (LLMs) have shown exceptional capabilities in a wide range of applications due to their fantastic emergence ability. To align with human preference, instruction-tuning and reinforcement learning from human feedback (RLHF) are proposed for Chat-based LLMs (e.g., ChatGPT, GPT-4). However, these LLMs (except for Codex) primarily focus on the general domain and are not specifically designed for the code domain. Although Codex provides an alternative choice, it is a closed-source model developed by OpenAI. Hence, it is imperative to develop open-source instruction-following LLMs for the code domain. 
+However, the large-scale number of LLMs' parameters ($\ge$7B) and training datasets require a vast amount of computational resources, which significantly impedes the development of training and inference on consumer hardware. 
 
-To handle these challenges, in this project, we adapt a latest powerful foundation model `Llama 2` and construct a high-quality instruction-following data for code generation task, and propose a instruction-following multilingual code generation Llama2 model. Meanwhile, to make it fit an academic budget and consumer hardware (e.g., a single RTX 3090), based on `Alpaca-LoRA`, we equip `CodeUp` with the advance of parameter-efficient fine-tuning (PEFT) methods (e.g., [LoRA](https://arxiv.org/abs/2106.09685)) which enable efficient adaptation of pre-trained language models (PLMs, also known as foundation model) to various downstream applications without fine-tuning the full model's parameters. The overall training recipe is as follows. 
+To handle these challenges, in this project, we adopt the latest powerful foundation model `Llama 2` and construct high-quality instruction-following data for code generation tasks, and propose an instruction-following multilingual code generation Llama2 model. Meanwhile, to make it fit an academic budget and consumer hardware (e.g., a single RTX 3090) based on `Alpaca-LoRA`, we equip `CodeUp` with the advanced parameter-efficient fine-tuning (PEFT) methods (e.g., [LoRA](https://arxiv.org/abs/2106.09685)) which enable efficient adaptation of pre-trained language models (PLMs, also known as foundation model) to various downstream applications without fine-tuning the entire model's parameters. The overall training recipe is as follows. 
 <center><img src="./assets/Framework_2.jpg" width="100%"></center>
 
 In summary, the repo contains:
@@ -27,21 +27,27 @@ In summary, the repo contains:
 
 
 ## NL2Code Data Release
-Recently, it has attracted significant attention to exploit much larger and more powerful LLMs (e.g., ChatGPT, GPT-4) to self generate instruction-following data by delicate prompt design. However, many approaches primarily focus on the general domain and lack code-specific domain considerations. To this end, [Code Alpaca](https://github.com/sahil280114/codealpaca) follows the previous Self-Instruct paper [3] and [Stanford Alpaca repo](https://github.com/tatsu-lab/stanford_alpaca) with some code-related modifications to conduct 20K instruction-following data `data/code_alpaca_20k.json` for code generation tasks. This `JSON` file following `alpaca_data.json` format is a list of dictionaries, each dictionary contains the following fields:
+Recently, it has attracted significant attention to exploiting much larger and more powerful LLMs (e.g., ChatGPT, GPT-4) to self-generate instruction-following data by delicate prompt design. However, many approaches primarily focus on the general domain and lack code-specific domain considerations. To this end, [Code Alpaca](https://github.com/sahil280114/codealpaca) follows the previous Self-Instruct paper [3] and [Stanford Alpaca repo](https://github.com/tatsu-lab/stanford_alpaca) with some code-related modifications to conduct 20K instruction-following data `data/code_alpaca_20k.json` for code generation tasks. This `JSON` file following `alpaca_data.json` format is a list of dictionaries; each dictionary contains the following fields:
 
 - `instruction`: `str`, describes the task the model should perform. Each of the 20K instructions is unique.
 - `input`: `str`, optional context or input for the task. For example, when the instruction is "Amend the following SQL query to select distinct elements", the input is the SQL query. Around 40% of the examples have an input.
 - `output`: `str`, the answer to the instruction as generated by `text-davinci-003`.
 
 ### High-quality Data Filter
-However, after we carefully check the LLMs-self-generated data, we observe three critical problems which may hinder the instruction learning of LLMs due to ambiguous and irrelevant noise. That are a) When `instruction` doesn't specify programming language (PL) of implementation, the `output` appears with diverse options, e.g., Python, C++, JavaScript, or b) it is ambiguous to identify which programming language `output` is implemented by; c) Both `instruction` and `output` are not relevant to code-specific domain. Hence, to obtain high-quality instruction data, we filter the ambiguous and irrelevant data by rigorous design. Specifically, to solve a) we set Python as the default PL of implementation and use [Guesslang](https://guesslang.readthedocs.io/en/latest/) package to detect the PL of a given source code in `output`, if the Python is detected, this prompt is retained. Otherwise, it will be filtered. b) and c) In these cases, we delete these prompts. After that, about 5K low-quality instruction data is filtered. To supplement the amout of high-quality instruction data, we further integrate the `data/new_codealpaca.json` data (about 4.5K) under the above filter rules. To achieve this, please runing the following command:
+However, after carefully checking the LLMs-self-generated data, we observe three critical problems that may hinder LLMs' instruction learning due to ambiguous and irrelevant noise. That is 
+
+1. When `instruction` doesn't specify the programming language (PL) of implementation, the `output` appears with diverse options, e.g., Python, C++, and JavaScript.
+2. It is ambiguous to identify which programming language `output` is implemented by.
+3. Both `instruction` and `output` are irrelevant to the code-specific domain. 
+
+Hence, we filter the ambiguous and irrelevant data by rigorous design to obtain high-quality instruction data. Specifically, to solve 1) we set Python as the default PL of implementation and use [Guesslang](https://guesslang.readthedocs.io/en/latest/) package to detect the PL of a given source code in `output`. If the Python is detected, this prompt is retained. Otherwise, it will be filtered. 2) and 3) In these cases, we delete these prompts. After that, about 5K low-quality instruction data is filtered. To supplement the high-quality instruction data, we further integrate the `data/new_codealpaca.json` data (about 4.5K) under the above filter rules. To achieve this, please run the following command:
 
 ```bash
 cd data
 python preprocess.py
 ```
 
-In this way, we gain the 19K high-quality instruction data of code generation. The following is the instruction number distribution of each PL with Radar visualization before and after filtering. 
+This way, we gain the 19K high-quality instruction data of code generation. The following is the instruction number distribution of each PL with Radar visualization before and after filtering. 
 
 | Raw Data (20K + 4K)| Filtered Data (19K)  |
 | -- | -- |
@@ -72,10 +78,9 @@ Furthermore, we follow the previous work to use the following prompts template `
  ```
 
 ## Training (`finetune.py`)
-
 To access Llama 2 model, please follow the [Download Guide](https://scontent-nrt1-1.xx.fbcdn.net/v/t39.2365-6/10000000_662098952474184_2584067087619170692_n.pdf?_nc_cat=105&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=ByL78P2ckIMAX8bqkga&_nc_ht=scontent-nrt1-1.xx&oh=00_AfDo3G6cAzYUombvtIceZm9x3NY0jg5mT_L4yEnXodk40w&oe=64C84A3F) and the difference between two versions of LLaMA can be found in [Model Card](https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md).
 
-To reproduce our fine-tuning runs for CodeUp, first install the dependencies
+To reproduce our fine-tuning runs for CodeUp, first, install the dependencies.
 
 ```bash
 pip install -r requirements.txt
@@ -128,8 +133,7 @@ bash run_codeup_llama-2.sh # run_codeup_llama.sh for LLaMA V1
 | <center><img src="./assets/train_loss.png" width="100%"></center>  | <center><img src="./assets/eval_loss.png" width="100%"></center> | 
 
 ## Inference (`generate.py`)
-
-This file reads the foundation model (i.e., Llama2 7B) from the Hugging Face model hub and the LoRA weights from `codeup-peft-llama-2`, and runs a `Gradio interface` for inference on a specified input. Users should treat this as example code for the use of the model, and modify it as needed.
+This file reads the foundation model (i.e., Llama2 7B) from the Hugging Face model hub and the LoRA weights from `codeup-peft-llama-2`, and runs a `Gradio interface` for inference on a specified input. Users should treat this as an example code for using the model and modify it as needed.
 
 ```bash
 python generate.py \
@@ -141,13 +145,10 @@ python generate.py \
 <center><img src="./assets/Interface.png" width="100%"></center>
 
 ## Checkpoint Export (`utils/export_*_checkpoint.py`)
-
 These files contain scripts that `merge` the LoRA weights back into the base model for export to Hugging Face format and to PyTorch `state_dicts`, which help users who want to run inference in projects like [llama.cpp](https://github.com/ggerganov/llama.cpp) or [alpaca.cpp](https://github.com/antimatter15/alpaca.cpp), which can run LLM locally on your `CPU` device.
-
 
 ## Useful Resources
 ### LLMs
-
 - [LLaMA](https://github.com/facebookresearch/llama), inference code for LLaMA models
 - [Llama 2](https://ai.meta.com/research/publications/llama-2-open-foundation-and-fine-tuned-chat-models/), open foundation and fine-tuned chat models
 - [Stanford Alpaca](https://github.com/tatsu-lab/stanford_alpaca), an instruction-following LLaMA model
@@ -168,16 +169,13 @@ These files contain scripts that `merge` the LoRA weights back into the base mod
 - [CodeBERT](https://github.com/microsoft/CodeBERT), a pre-trained language model for programming and natural languages
 
 ### CPU Running
-
 - [llama.cpp](https://github.com/ggerganov/llama.cpp), a native client for running LLaMA models on the CPU
 - [alpaca.cpp](https://github.com/antimatter15/alpaca.cpp), a native client for running Alpaca models on the CPU
 
 ### Interface
-
 - [Alpaca-LoRA-Serve](https://github.com/deep-diver/Alpaca-LoRA-Serve), a ChatGPT-style interface for Alpaca models
 
 ### Dataset
-
 - [AlpacaDataCleaned](https://github.com/gururise/AlpacaDataCleaned), a project to improve the quality of the Alpaca dataset
 - [GPT-4 Alpaca Data](https://github.com/Instruction-Tuning-with-GPT-4/GPT-4-LLM), a project to port synthetic data creation to GPT-4
 - [Code Alpaca Data](https://github.com/sahil280114/codealpaca/tree/master/data), a project for code generation
@@ -191,7 +189,6 @@ These files contain scripts that `merge` the LoRA weights back into the base mod
 - [https://huggingface.co/chansung/gpt4-alpaca-lora-7b](https://huggingface.co/chansung/gpt4-alpaca-lora-7b)
 
 ### Papers
-
 - [A Survey of Large Language Models](https://arxiv.org/abs/2303.18223)
 - [Codex: Evaluating Large Language Models Trained on Code](https://arxiv.org/pdf/2107.03374)
 - [LLaMA: Open and Efficient Foundation Language Models](https://arxiv.org/abs/2302.13971v1)
@@ -210,7 +207,6 @@ These files contain scripts that `merge` the LoRA weights back into the base mod
 - [CodeXGLUE: A Machine Learning Benchmark Dataset for Code Understanding and Generation](https://arxiv.org/abs/2102.04664)
 
 ## Citation
-
 If you use the data or code in this repo, please cite the repo.
 
 ```
