@@ -78,7 +78,7 @@ Furthermore, we follow the previous work to use the following prompts template `
  ```
 
 ## Training (`finetune.py`)
-To access Llama 2 model, please follow the [Download Guide](https://scontent-nrt1-1.xx.fbcdn.net/v/t39.2365-6/10000000_662098952474184_2584067087619170692_n.pdf?_nc_cat=105&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=ByL78P2ckIMAX8bqkga&_nc_ht=scontent-nrt1-1.xx&oh=00_AfDo3G6cAzYUombvtIceZm9x3NY0jg5mT_L4yEnXodk40w&oe=64C84A3F) and the difference between two versions of LLaMA can be found in [Model Card](https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md).
+To access Llama 2 model, please follow the [Download Guide](https://github.com/facebookresearch/llama/tree/main#download) and the difference between two versions of LLaMA can be found in [Model Card](https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md).
 
 To reproduce our fine-tuning runs for CodeUp, first, install the dependencies.
 
@@ -86,7 +86,7 @@ To reproduce our fine-tuning runs for CodeUp, first, install the dependencies.
 pip install -r requirements.txt
 ```
 
-The `finetune.py` file contains a straightforward application of [PEFT](https://github.com/juyongjiang/PEFT) to the Llama 2 model, as well as some code related to prompt construction and tokenization.
+The `finetune.py` file contains a straightforward application of [PEFT](https://github.com/huggingface/peft) to the Llama 2 model, as well as some code related to prompt construction and tokenization.
 
 ```bash
 python finetune.py \
@@ -132,6 +132,62 @@ bash run_codeup_llama-2.sh # run_codeup_llama.sh for LLaMA V1
 | -- | -- |
 | <center><img src="./assets/train_loss.png" width="100%"></center>  | <center><img src="./assets/eval_loss.png" width="100%"></center> | 
 
+**Note that** if you meet the following `OSError`:
+
+```bash
+raise EnvironmentError(
+OSError: meta-llama/Llama-2-13b-chat-hf is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo with `use_auth_token` or log in with `huggingface-cli login` and pass `use_auth_token=True`.
+```
+
+You can solve this `Exception` as follows.
+
+Step 1:
+
+```bash
+huggingface-cli login
+```
+
+Step 2:
+
+Then, you can see the following prompt in your terminal:
+```bash
+$ huggingface-cli login
+
+    _|    _|  _|    _|    _|_|_|    _|_|_|  _|_|_|  _|      _|    _|_|_|      _|_|_|_|    _|_|      _|_|_|  _|_|_|_|
+    _|    _|  _|    _|  _|        _|          _|    _|_|    _|  _|            _|        _|    _|  _|        _|
+    _|_|_|_|  _|    _|  _|  _|_|  _|  _|_|    _|    _|  _|  _|  _|  _|_|      _|_|_|    _|_|_|_|  _|        _|_|_|
+    _|    _|  _|    _|  _|    _|  _|    _|    _|    _|    _|_|  _|    _|      _|        _|    _|  _|        _|
+    _|    _|    _|_|      _|_|_|    _|_|_|  _|_|_|  _|      _|    _|_|_|      _|        _|    _|    _|_|_|  _|_|_|_|
+    
+    To login, `huggingface_hub` requires a token generated from https://huggingface.co/settings/tokens .
+Token: 
+```
+
+Step 3:
+
+Click and open [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens), then copy `User Access Tokens` or create a new one. Note that as a prerequisite, you should already have access to Meta AI's [Llama2 download](https://github.com/facebookresearch/llama/tree/main#download).
+
+```bash
+Token has not been saved to git credential helper.
+Your token has been saved to /home/john/.cache/huggingface/token
+Login successful
+```
+
+After logining successfully, please rerun the above fine-tuning command. If you meet another bugs:
+
+```bash
+AttributeError: /home/xxx/lib/python3.8/site-packages/bitsandbytes/libbitsandbytes_cpu.so: undefined symbol: cget_col_row_stats
+```
+
+Please run the following commands to solve it. 
+
+```
+$ nvidia-smi # get CUDA Version of your system
+$ cd /home/xxx/lib/python3.8/site-packages/bitsandbytes
+$ cp libbitsandbytes_cudaxxx.so libbitsandbytes_cpu.so # replace `xxx` with your CUDA Version
+```
+
 ## Inference (`generate.py`)
 This file reads the foundation model (i.e., Llama2 7B) from the Hugging Face model hub and the LoRA weights from `codeup-peft-llama-2`, and runs a `Gradio interface` for inference on a specified input. Users should treat this as an example code for using the model and modify it as needed.
 
@@ -155,7 +211,7 @@ These files contain scripts that `merge` the LoRA weights back into the base mod
 - [Alpaca-Lora](https://github.com/tloen/alpaca-lora), instruct-tune LLaMA on consumer hardware
 - [FastChat](https://github.com/lm-sys/FastChat), an open platform for training, serving, and evaluating large language models. Release repo for Vicuna and Chatbot Arena.
 - [GPT Code UI](https://github.com/ricklamers/gpt-code-ui), an open source implementation of OpenAI's ChatGPT Code interpreter
-- [PEFT](https://github.com/juyongjiang/PEFT), state-of-the-art parameter-efficient fine-tuning (PEFT) methods
+- [PEFT](https://github.com/huggingface/peft), state-of-the-art parameter-efficient fine-tuning (PEFT) methods
 - [Codex](https://github.com/openai/human-eval), an evaluation harness for the HumanEval problem solving dataset
 - [Code Alpaca](https://github.com/sahil280114/codealpaca), an instruction-following LLaMA model trained on code generation instructions
 - [WizardLM](https://github.com/nlpxucan/WizardLM), an instruction-following LLM using Evol-Instruct
@@ -181,6 +237,10 @@ These files contain scripts that `merge` the LoRA weights back into the base mod
 - [Code Alpaca Data](https://github.com/sahil280114/codealpaca/tree/master/data), a project for code generation
 - [CodeXGLUE](https://github.com/microsoft/CodeXGLUE), a machine learning benchmark dataset for code understanding and generation
 - [HumanEval](https://github.com/openai/human-eval), [APPS](https://huggingface.co/datasets/codeparrot/apps), [HumanEval+](https://github.com/evalplus/evalplus), [MBPP](https://huggingface.co/datasets/mbpp), and [DS-1000](https://github.com/HKUNLP/DS-1000)
+
+### Evaluation
+- [Multilingual Code Models Evaluation Leadboard](https://huggingface.co/spaces/bigcode/multilingual-code-evals)
+- [Code Generation LM Evaluation Harness](https://github.com/bigcode-project/bigcode-evaluation-harness)
 
 ### Hugging Face
 - [https://huggingface.co/decapoda-research/llama-7b-hf](https://huggingface.co/decapoda-research/llama-7b-hf)
@@ -219,4 +279,4 @@ If you use the data or code in this repo, please cite the repo.
   howpublished = {\url{https://github.com/juyongjiang/CodeUp}},
 }
 ```
-Naturally, you should also cite the original LLaMA V1 [1] & V2 paper [2], and the Self-Instruct paper [3], and the LoRA paper [4], and the [Stanford Alpaca repo](https://github.com/tatsu-lab/stanford_alpaca), and [Alpaca-LoRA repo](https://github.com/tloen/alpaca-lora), and [Code Alpaca repo](https://github.com/sahil280114/codealpaca), and [PEFT](https://github.com/juyongjiang/PEFT).
+Naturally, you should also cite the original LLaMA V1 [1] & V2 paper [2], and the Self-Instruct paper [3], and the LoRA paper [4], and the [Stanford Alpaca repo](https://github.com/tatsu-lab/stanford_alpaca), and [Alpaca-LoRA repo](https://github.com/tloen/alpaca-lora), and [Code Alpaca repo](https://github.com/sahil280114/codealpaca), and [PEFT](https://github.com/huggingface/peft).

@@ -13,3 +13,4 @@ todo.txt
 .venv
 .vscode
 .DS_Store
+wandb/
