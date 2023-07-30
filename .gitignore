@@ -14,3 +14,4 @@ todo.txt
 .vscode
 .DS_Store
 wandb/
+codeup-perf-**/runs/
