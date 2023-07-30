@@ -106,6 +106,7 @@ python finetune.py \
     --train_on_inputs \
     --group_by_length
 ```
+Note that gradient accumulation steps equals `batch_size // micro_batch_size`.
 
 However, the latest CodeUp-7B model (`codeup-peft-llama-2`) was fine-tuned on a single NVIDIA GeForce RTX 3090 24GB memory on July 28 for 11 hours with the following command:
 
@@ -119,7 +120,7 @@ python finetune.py \
     --output_dir='./codeup-peft-llama-2' \
     --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
     --lora_r=16 \
-    --micro_batch_size=4
+    --micro_batch_size=16
 ``` 
 
 or 
@@ -200,8 +201,17 @@ python generate.py \
 
 <center><img src="./assets/Interface.png" width="100%"></center>
 
-## Checkpoint Export (`utils/export_*_checkpoint.py`)
-These files contain scripts that `merge` the LoRA weights back into the base model for export to Hugging Face format and to PyTorch `state_dicts`, which help users who want to run inference in projects like [llama.cpp](https://github.com/ggerganov/llama.cpp) or [alpaca.cpp](https://github.com/antimatter15/alpaca.cpp), which can run LLM locally on your `CPU` device.
+## Checkpoint Export
+This script `merge` the LoRA weights back into the base model for exporting to Hugging Face format or to PyTorch `state_dicts`, which help users who want to run inference in projects like [llama.cpp](https://github.com/ggerganov/llama.cpp) or [alpaca.cpp](https://github.com/antimatter15/alpaca.cpp), which can run LLM locally on your `CPU` device. After that, you can upload your model to Hugging Face Hub by `git`.
+
+```bash
+python export_checkpoint.py \
+    --base_model='meta-llama/Llama-2-7b-hf' \
+    --lora_weights='codeup-peft-llama-2' \
+    --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
+    --export_dir='export_checkpoint/7b' \
+    --checkpoint_type='hf' # set to 'pytorch' if saved as state_dicts format of Pytorch 
+```
 
 ## Useful Resources
 ### LLMs

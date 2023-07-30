@@ -7,4 +7,11 @@ python finetune.py \
     --output_dir='./codeup-peft-llama-2-chat' \
     --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
     --lora_r=16 \
-    --micro_batch_size=4 
+    --micro_batch_size=16 
+
+python export_checkpoint.py \
+    --base_model='meta-llama/Llama-2-7b-chat-hf' \
+    --lora_weights='codeup-peft-llama-2-chat' \
+    --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
+    --export_dir='export_checkpoint/7b-chat' \
+    --checkpoint_type='hf'

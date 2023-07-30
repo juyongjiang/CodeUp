@@ -35,7 +35,7 @@ def train(
     micro_batch_size: int = 4,
     num_epochs: int = 3,
     learning_rate: float = 3e-4,
-    cutoff_len: int = 256,
+    cutoff_len: int = 512,
     val_set_size: int = 2000,
     # lora hyperparams
     lora_r: int = 8,
@@ -89,6 +89,10 @@ def train(
     gradient_accumulation_steps = batch_size // micro_batch_size
 
     prompter = Prompter(prompt_template_name)
+
+    print(lora_target_modules)
+    print(eval(lora_target_modules[0]))
+    input('check')
 
     device_map = "auto"
     world_size = int(os.environ.get("WORLD_SIZE", 1))

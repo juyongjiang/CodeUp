@@ -180,13 +180,13 @@ def main(
                 minimum=1, maximum=4, step=1, value=4, label="Beams"
             ),
             gr.components.Slider(
-                minimum=1, maximum=2000, step=1, value=128, label="Max tokens"
+                minimum=1, maximum=2000, step=1, value=512, label="Max tokens"
             ),
             gr.components.Checkbox(label="Stream output"),
         ],
         outputs=[
             gr.inputs.Textbox(
-                lines=5,
+                lines=10,
                 label="Output",
             )
         ],
