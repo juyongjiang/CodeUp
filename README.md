@@ -214,7 +214,7 @@ python export_checkpoint.py \
     --checkpoint_type='hf' # set to 'pytorch' if saved as state_dicts format of Pytorch 
 ```
 
-**Note that** if you meet the following error when you upload large files by `git`, please increase the size of buffer settings. 
+**Note that** if you meet the following error when you upload large files by `git`, please make sure use `Git LFS`. Refer to [Uploading files larger than 5GB to model hub](https://discuss.huggingface.co/t/uploading-files-larger-than-5gb-to-model-hub/4081) | [git: 'lfs' is not a git command unclear](https://stackoverflow.com/questions/48734119/git-lfs-is-not-a-git-command-unclear)
 
 ```bash
 error: RPC failed; HTTP 408 curl 22 The requested URL returned error: 408
@@ -224,10 +224,56 @@ Total 54 (delta 0), reused 0 (delta 0)
 fatal: the remote end hung up unexpectedly
 Everything up-to-date
 ```
+<!-- git config --global http.postBuffer 53687091200 # 50GiB = 50 * 1024^3 -->
 
 ```
-git config --global http.postBuffer 53687091200 # 50GiB = 50 * 1024^3
+sudo apt-get install git-lfs
+git-lfs install
 ```
+
+## Evaluation
+We use the open-source framework [Code Generation LM Evaluation Harness](https://github.com/bigcode-project/bigcode-evaluation-harness) developed by BigCode team to evaluate our CodeUp performance.
+
+### Setup
+```bash
+git clone https://github.com/bigcode-project/bigcode-evaluation-harness.git
+cd bigcode-evaluation-harness
+pip install -e .
+```
+Also make sure you have `git-lfs`` installed (above guide) and are logged in the Hub
+```bash
+huggingface-cli login
+```
+### Usage
+You can use this evaluation framework to generate text solutions to code benchmarks with any autoregressive model available on [Hugging Face hub](https://huggingface.co/), to evaluate (and execute) the solutions or to do both. While it is better to use GPUs for the generation, the evaluation only requires CPUs. So it might be beneficial to separate these two steps (i.e., `--generation_only` or `--load_generations_path`). By default both generation and evaluation are performed.
+
+For more details on how to evaluate on the various tasks (i.e., benchmark), please refer to the documentation in [`bigcode-evaluation-harness/docs/README.md`](https://github.com/bigcode-project/bigcode-evaluation-harness/blob/main/docs/README.md). 
+
+Below is an example of CodeUp to `generate and evaluate` on a `multiple-py` task (i.e., benchmark), which denotes `HumanEval` benchmark is translated into 18 programming languages.
+
+```bash
+accelerate launch  main.py \
+  --model deepse/CodeUp-Llama-2-7b-hf \
+  --tasks multiple-py \
+  --max_length_generation 650 \
+  --temperature 0.8 \
+  --do_sample True \
+  --n_samples 200 \
+  --batch_size 200 \
+  --allow_code_execution \
+  --save_generations
+```
+
+* `--limit` represents the number of problems to solve, if it's not provided, all problems in the benchmark are selected. 
+* `--allow_code_execution` is for executing the generated code: it is off by default, read the displayed warning before calling it to enable execution. 
+* Some models with custom code on the HF hub like [SantaCoder](https://huggingface.co/bigcode/santacoder) require calling `--trust_remote_code`, for private models add `--use_auth_token`.
+* `--save_generations` saves the post-processed generations in a json file at `--save_generations_path` (by default `generations.json`). You can also save references by calling `--save_references`
+* `--max_length_generation` is the maximum token length of generation including the input token length. The default is 512, but for some tasks like GSM8K and GSM-Hard, the complete prompt with 8 shot examples (as used in [PAL](https://github.com/reasoning-machines/pal)) take up `~1500` tokens, hence the value should be greater than that and the recommended value of `--max_length_generation` is `2048` for these tasks.
+* For APPS tasks, you can use `--n_samples=1` for strict and average accuracies (from the original APPS paper) and `n_samples>1` for `pass@k` metrics.
+
+Note that some tasks (i.e., benchmarks) don't require code execution (i.e., don't specify `--allow_code_execution`) due to text generation task or lacking unit tests, such as
+`codexglue_code_to_text-<LANGUAGE>`/`codexglue_code_to_text-python-left`/`conala`/`concode` that use BLEU evaluation. 
+In addition, we generate one candidate solution for each problem in these tasks, so use `--n_samples=1` and `--batch_size=1`. (Note that `batch_size` should always be equal or less than `n_samples`).
 
 ## Useful Resources
 ### LLMs
