@@ -16,3 +16,4 @@ todo.txt
 wandb/
 codeup-perf-**/runs/
 export_checkpoint/*
+CodeUp-Llama-2-7b**

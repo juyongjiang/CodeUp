@@ -214,7 +214,7 @@ python export_checkpoint.py \
     --checkpoint_type='hf' # set to 'pytorch' if saved as state_dicts format of Pytorch 
 ```
 
-**Note that** if you meet the following error when you upload large files by `git`, please make sure use `Git LFS`. Refer to [Uploading files larger than 5GB to model hub](https://discuss.huggingface.co/t/uploading-files-larger-than-5gb-to-model-hub/4081) | [git: 'lfs' is not a git command unclear](https://stackoverflow.com/questions/48734119/git-lfs-is-not-a-git-command-unclear)
+**Note that** if you meet the following error when you upload large files by `git`, please make sure use [`Git LFS`](https://git-lfs.com/). Refer to [Uploading files larger than 5GB to model hub](https://discuss.huggingface.co/t/uploading-files-larger-than-5gb-to-model-hub/4081) and [git: 'lfs' is not a git command unclear](https://stackoverflow.com/questions/48734119/git-lfs-is-not-a-git-command-unclear)
 
 ```bash
 error: RPC failed; HTTP 408 curl 22 The requested URL returned error: 408
@@ -224,11 +224,20 @@ Total 54 (delta 0), reused 0 (delta 0)
 fatal: the remote end hung up unexpectedly
 Everything up-to-date
 ```
-<!-- git config --global http.postBuffer 53687091200 # 50GiB = 50 * 1024^3 -->
-
+<!-- git config --global http.postBuffer 12884901888 # 12GiB = 12 * 1024^3 -->
+<!-- huggingface-cli lfs-enable-largefiles -->
 ```
 sudo apt-get install git-lfs
-git-lfs install
+git lfs install 
+huggingface-cli lfs-enable-largefiles .
+
+git lfs track "*.png"
+git lfs track "*.jpg"
+git add .gitattributes
+
+git add .
+git commit -m "codeup-llama-2-7b-hf"
+git push
 ```
 
 ## Evaluation
@@ -264,6 +273,18 @@ accelerate launch  main.py \
   --save_generations
 ```
 
+* `--model` can be any autoregressive model available on [Hugging Face hub](https://huggingface.co/) can be used, but we recommend using code generation models trained specifically on Code such as [SantaCoder](https://huggingface.co/bigcode/santacoder), [InCoder](https://huggingface.co/facebook/incoder-6B) and [CodeGen](https://huggingface.co/Salesforce/codegen-16B-mono).
+* `--tasks` denotes a variety of benchmarks as follows:
+    ```bash
+    'codexglue_code_to_text-go', 'codexglue_code_to_text-java', 'codexglue_code_to_text-javascript', 'codexglue_code_to_text-php', 'codexglue_code_to_text-python', 'codexglue_code_to_text-python-left', 'codexglue_code_to_text-ruby', 'codexglue_text_to_text-da_en', 'codexglue_text_to_text-lv_en', 'codexglue_text_to_text-no_en', 'codexglue_text_to_text-zh_en', 
+    'conala', 
+    'concode', 
+    'ds1000-all-completion', 'ds1000-all-insertion', 'ds1000-matplotlib-completion', 'ds1000-matplotlib-insertion', 'ds1000-numpy-completion', 'ds1000-numpy-insertion', 'ds1000-pandas-completion', 'ds1000-pandas-insertion', 'ds1000-pytorch-completion', 'ds1000-pytorch-insertion', 'ds1000-scipy-completion', 'ds1000-scipy-insertion', 'ds1000-sklearn-completion', 'ds1000-sklearn-insertion', 'ds1000-tensorflow-completion', 'ds1000-tensorflow-insertion', 
+    'humaneval', 'instruct-humaneval', 'instruct-humaneval-nocontext', 
+    'mbpp', 
+    'multiple-cpp', 'multiple-cs', 'multiple-d', 'multiple-go', 'multiple-java', 'multiple-jl', 'multiple-js', 'multiple-lua', 'multiple-php', 'multiple-pl', 'multiple-py', 'multiple-r', 'multiple-rb', 'multiple-rkt', 'multiple-rs', 'multiple-scala', 'multiple-sh', 'multiple-swift', 'multiple-ts', 
+    'pal-gsm8k-greedy', 'pal-gsm8k-majority_voting', 'pal-gsmhard-greedy', 'pal-gsmhard-majority_voting']
+    ```
 * `--limit` represents the number of problems to solve, if it's not provided, all problems in the benchmark are selected. 
 * `--allow_code_execution` is for executing the generated code: it is off by default, read the displayed warning before calling it to enable execution. 
 * Some models with custom code on the HF hub like [SantaCoder](https://huggingface.co/bigcode/santacoder) require calling `--trust_remote_code`, for private models add `--use_auth_token`.

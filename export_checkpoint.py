@@ -55,8 +55,9 @@ def export_checkpoint(
         }
 
         LlamaForCausalLM.save_pretrained(
-            base_model, f"{export_dir}/hf_ckpt", state_dict=deloreanized_sd, max_shard_size="400MB"
+            base_model, f"{export_dir}/hf_ckpt", state_dict=deloreanized_sd, max_shard_size="10GB"
         )
+        tokenizer.save_pretrained(f"{export_dir}/hf_ckpt")
     elif checkpoint_type.lower() == "pytorch":
         # merge weights
         for layer in lora_model.base_model.model.model.layers:
