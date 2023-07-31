@@ -146,6 +146,7 @@ You can solve this `Exception` as follows.
 Step 1:
 
 ```bash
+git config --global credential.helper store
 huggingface-cli login
 ```
 
@@ -211,6 +212,21 @@ python export_checkpoint.py \
     --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
     --export_dir='export_checkpoint/7b' \
     --checkpoint_type='hf' # set to 'pytorch' if saved as state_dicts format of Pytorch 
+```
+
+**Note that** if you meet the following error when you upload large files by `git`, please increase the size of buffer settings. 
+
+```bash
+error: RPC failed; HTTP 408 curl 22 The requested URL returned error: 408
+fatal: the remote end hung up unexpectedly
+Writing objects: 100% (54/54), 9.66 GiB | 7.72 MiB/s, done.
+Total 54 (delta 0), reused 0 (delta 0)
+fatal: the remote end hung up unexpectedly
+Everything up-to-date
+```
+
+```
+git config --global http.postBuffer 53687091200 # 50GiB = 50 * 1024^3
 ```
 
 ## Useful Resources
