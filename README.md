@@ -9,6 +9,23 @@
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/release/python-390/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+## Table of Contents
+- [Overview](#overview)
+- [NL2Code Data Release](#nl2code-data-release)
+    - [High-quality Data Filter](#high-quality-data-filter)
+- [Training (finetune.py)](#training-finetunepy)
+- [Inference (generate.py)](#inference-generatepy)
+- [Checkpoint Export](#checkpoint-export)
+- [Evaluation](#evaluation)
+- [Useful Resources](#useful-resources)
+    - [LLMs](#llms)
+    - [CPU Running](#cpu-running)
+    - [Interface](#interface)
+    - [Dataset](#dataset)
+    - [Evaluation](#evaluation)
+    - [Hugging Face](#hugging-face)
+    - [Papers](#papers)
+
 ## Overview
 In recent years, large language models (LLMs) have shown exceptional capabilities in a wide range of applications due to their fantastic emergence ability. To align with human preference, instruction-tuning and reinforcement learning from human feedback (RLHF) are proposed for Chat-based LLMs (e.g., ChatGPT, GPT-4). However, these LLMs (except for Codex) primarily focus on the general domain and are not specifically designed for the code domain. Although Codex provides an alternative choice, it is a closed-source model developed by OpenAI. Hence, it is imperative to develop open-source instruction-following LLMs for the code domain. 
 However, the large-scale number of LLMs' parameters ($\ge$7B) and training datasets require a vast amount of computational resources, which significantly impedes the development of training and inference on consumer hardware. 
