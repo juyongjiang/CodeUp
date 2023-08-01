@@ -257,6 +257,11 @@ git commit -m "codeup-llama-2-7b-hf"
 git push
 ```
 
+Up to now, we have contributed `CodeUp-Llama-2-7b-hf`, `CodeUp-Llama-2-7b-chat-hf`, and `CodeUp-Llama-2-13b-chat-hf` for which we use `Llama-2-7b`, `Llama-2-7b-chat`, and `Llama-2-13b-chat` as foundation model respectively, to Hugging Face Hub. The reason why we use `Llama-2-xx-chat`-based models, which have been trained on instruction-tuning (over 100K) and RLHF (over 1M), is to further enhance the understanding capability of instructions due to the `amount` and `diversity` limitation of our `codeup_19k.json`.  
+
+<center><img src="./assets/hf_models.jpg" width="100%"></center>
+
+
 ## Evaluation
 We use the open-source framework [Code Generation LM Evaluation Harness](https://github.com/bigcode-project/bigcode-evaluation-harness) developed by BigCode team to evaluate our CodeUp performance.
 
