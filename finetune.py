@@ -90,10 +90,6 @@ def train(
 
     prompter = Prompter(prompt_template_name)
 
-    print(lora_target_modules)
-    print(eval(lora_target_modules[0]))
-    input('check')
-
     device_map = "auto"
     world_size = int(os.environ.get("WORLD_SIZE", 1))
     ddp = world_size != 1
