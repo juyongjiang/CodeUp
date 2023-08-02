@@ -221,6 +221,12 @@ python generate.py \
     --lora_weights 'codeup-peft-llama-2/7b'
 ```
 
+**Note that** if you meet the bug of `ImportError: cannot import name 'NotRequired' from 'typing_extensions'`, you can solve this as follows:
+```bash
+pip uninstall typing_extensions # upgrade 3.7.x to 4.7.x
+pip install typing_extensions
+```
+
 <center><img src="./assets/Interface.png" width="100%"></center>
 
 ## Checkpoint Merge & Export
