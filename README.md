@@ -15,7 +15,7 @@
     - [High-quality Data Filter](#high-quality-data-filter)
 - [Training (finetune.py)](#training-finetunepy)
 - [Inference (generate.py)](#inference-generatepy)
-- [Checkpoint Export](#checkpoint-export)
+- [Checkpoint Merge & Export](#checkpoint-merge--export)
 - [Evaluation](#evaluation)
 - [Useful Resources](#useful-resources)
     - [LLMs](#llms)
@@ -25,6 +25,10 @@
     - [Evaluation](#evaluation)
     - [Hugging Face](#hugging-face)
     - [Papers](#papers)
+
+## TODO
+- [ ] Retrain CodeUp on [`rombodawg/MegaCodeTraining112k`] data.
+- [ ] Report comprehensive code generation performance on a variety of programming language.
 
 ## Overview
 In recent years, large language models (LLMs) have shown exceptional capabilities in a wide range of applications due to their fantastic emergence ability. To align with human preference, instruction-tuning and reinforcement learning from human feedback (RLHF) are proposed for Chat-based LLMs (e.g., ChatGPT, GPT-4). However, these LLMs (except for Codex) primarily focus on the general domain and are not specifically designed for the code domain. Although Codex provides an alternative choice, it is a closed-source model developed by OpenAI. Hence, it is imperative to develop open-source instruction-following LLMs for the code domain. 
@@ -109,7 +113,7 @@ The `finetune.py` file contains a straightforward application of [PEFT](https://
 python finetune.py \
     --base_model 'meta-llama/Llama-2-7b-hf' \
     --data_path 'data/codeup_19k.json' \
-    --output_dir './codeup-peft-llama-2' \
+    --output_dir './codeup-peft-llama-2/7b' \
     --batch_size 128 \
     --micro_batch_size 4 \
     --num_epochs 1 \
@@ -125,7 +129,7 @@ python finetune.py \
 ```
 Note that gradient accumulation steps equals `batch_size // micro_batch_size`.
 
-However, the latest CodeUp-7B model (`codeup-peft-llama-2`) was fine-tuned on a single NVIDIA GeForce RTX 3090 24GB memory on July 28 for 11 hours with the following command:
+However, the latest CodeUp-7B model (`codeup-peft-llama-2/7b`) was fine-tuned on a single NVIDIA GeForce RTX 3090 24GB memory on July 28 for 11 hours with the following command:
 
 ```bash
 python finetune.py \
@@ -134,7 +138,7 @@ python finetune.py \
     --num_epochs=10 \
     --cutoff_len=512 \
     --group_by_length \
-    --output_dir='./codeup-peft-llama-2' \
+    --output_dir='./codeup-peft-llama-2/7b' \
     --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
     --lora_r=16 \
     --micro_batch_size=16
@@ -208,24 +212,25 @@ $ cp libbitsandbytes_cudaxxx.so libbitsandbytes_cpu.so # replace `xxx` with your
 ```
 
 ## Inference (`generate.py`)
-This file reads the foundation model (i.e., Llama2 7B) from the Hugging Face model hub and the LoRA weights from `codeup-peft-llama-2`, and runs a `Gradio interface` for inference on a specified input. Users should treat this as an example code for using the model and modify it as needed.
+This file reads the foundation model (i.e., Llama2 7B) from the Hugging Face model hub and the LoRA weights from `codeup-peft-llama-2/7b`, and runs a `Gradio interface` for inference on a specified input. Users should treat this as an example code for using the model and modify it as needed.
 
 ```bash
 python generate.py \
     --load_8bit \
     --base_model 'meta-llama/Llama-2-7b-hf' \
-    --lora_weights 'codeup-peft-llama-2'
+    --lora_weights 'codeup-peft-llama-2/7b'
 ```
 
 <center><img src="./assets/Interface.png" width="100%"></center>
 
-## Checkpoint Export
+## Checkpoint Merge & Export
 This script `merge` the LoRA weights back into the base model for exporting to Hugging Face format or to PyTorch `state_dicts`, which help users who want to run inference in projects like [llama.cpp](https://github.com/ggerganov/llama.cpp) or [alpaca.cpp](https://github.com/antimatter15/alpaca.cpp), which can run LLM locally on your `CPU` device. After that, you can upload your model to Hugging Face Hub by `git`.
+
 
 ```bash
 python export_checkpoint.py \
     --base_model='meta-llama/Llama-2-7b-hf' \
-    --lora_weights='codeup-peft-llama-2' \
+    --lora_weights='codeup-peft-llama-2/7b' \
     --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
     --export_dir='export_checkpoint/7b' \
     --checkpoint_type='hf' # set to 'pytorch' if saved as state_dicts format of Pytorch 
@@ -257,9 +262,11 @@ git commit -m "codeup-llama-2-7b-hf"
 git push
 ```
 
-Up to now, we have contributed [`CodeUp-Llama-2-7b-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-7b-hf), [`CodeUp-Llama-2-7b-chat-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-7b-chat-hf), and [`CodeUp-Llama-2-13b-chat-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-13b-chat-hf) for which we use `Llama-2-7b`, `Llama-2-7b-chat`, and `Llama-2-13b-chat` as foundation model respectively, to [Hugging Face Hub](https://huggingface.co/deepse). The reason why we use `Llama-2-xx-chat`-based models, which have been trained on instruction-tuning (over 100K) and RLHF (over 1M), is to further enhance the understanding capability of instructions due to the `amount` and `diversity` limitation of our `codeup_19k.json`.  
+Up to now, we have contributed [`CodeUp-Llama-2-7b-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-7b-hf), [`CodeUp-Llama-2-7b-chat-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-7b-chat-hf), [`CodeUp-Llama-2-13b-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-13b-hf), and [`CodeUp-Llama-2-13b-chat-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-13b-chat-hf) for which we use `Llama-2-7b`, `Llama-2-7b-chat`, and `Llama-2-13b-chat` as foundation model respectively, to [Hugging Face Hub](https://huggingface.co/deepse). **The reason why we use `Llama-2-xx-chat`-based models, which have been trained on instruction-tuning (over 100K) and RLHF (over 1M), is to further enhance the understanding capability of instructions due to the `amount` and `diversity` limitation of our `codeup_19k.json`.**  
 
 <center><img src="./assets/hf_models.jpg" width="100%"></center>
+
+In summary, the individual LoRA weights can be found in [`codeup-peft-llama-2/7b`](./codeup-peft-llama-2/7b), [`codeup-peft-llama-2/7b-chat`](./codeup-peft-llama-2/7b-chat), [`codeup-peft-llama-2/13b`](./codeup-peft-llama-2/13b), and [`codeup-peft-llama-2/13b-chat`](./codeup-peft-llama-2/13b-chat), while the merged CodeUp weights (Llama 2 + LoRA weights) have been uploaded in [Hugging Face Hub](https://huggingface.co/deepse). **It is worthwhile to note that if you follow the steps of `Inference (`generate.py`)`, the inference can be conducted in a single RTX 3090 24GB. Otherwise, you need the standard GPUs memory of Llama 2 when you use the merged parameters from Hugging Face Hub.** 
 
 
 ## Evaluation
