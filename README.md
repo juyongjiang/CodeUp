@@ -27,7 +27,7 @@
     - [Papers](#papers)
 
 ## TODO
-- [ ] Retrain CodeUp on [`rombodawg/MegaCodeTraining112k`] data.
+- [ ] Retrain CodeUp on [`rombodawg/MegaCodeTraining112k`](https://huggingface.co/datasets/rombodawg/MegaCodeTraining112k) data.
 - [ ] Report comprehensive code generation performance on a variety of programming language.
 
 ## Overview
