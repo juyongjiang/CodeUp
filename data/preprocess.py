@@ -19,8 +19,32 @@ per_pl_num = dict.fromkeys(pl_name, 0)
 with open('./code_alpaca_20k.json', 'r') as f, open('./new_codealpaca.json', 'r') as f_new:
     json_data = json.load(f)
     json_data_new = json.load(f_new)
-    print(len(json_data), len(json_data_new))
+    print("code_alpaca = ", len(json_data), "new_codealpaca = ", len(json_data_new))
     json_data.extend(json_data_new)
+    print("code_alpaca + new_codealpaca = ", len(json_data))
+
+rombos_code_json_data = []
+with open('./RombosCodeTraining112k.json', 'r') as f:
+    rombos_code_112k_data = f.readlines()
+    for data in rombos_code_112k_data:
+        sample = eval(data)
+        format_sample = {
+            "instruction": sample["prompt"],
+            "input": "",
+            "output": sample["completion"],
+        }
+        rombos_code_json_data.append(format_sample)
+    print("rombos_code = ", len(rombos_code_json_data))
+
+format_rombos_code_json_data = json.dumps(rombos_code_json_data, indent=6)
+with open(f'romboscode_{len(rombos_code_json_data)//1000}k.json', 'w') as f:
+    f.write(format_rombos_code_json_data)
+
+json_data.extend(rombos_code_json_data)
+print("code_alpaca + new_codealpaca + rombos_code = ", len(json_data))
+
+##
+
 all_sample = len(json_data)
 print("all instruction num: ", all_sample)
 
@@ -48,9 +72,7 @@ for sample in json_data:
 # print the statistic of PL
 per_pl_num['Others'] = len(unknown_pl_data)
 print(per_pl_num)
-print(sum(per_pl_num.values()), len(unknown_pl_data))
 print(f"unknown PL num: {len(unknown_pl_data)}")
-
 
 # set the python as default PL for unknown PL data
 python_default = copy.deepcopy(per_pl_num)
@@ -58,7 +80,10 @@ guess_pl = Guess()
 python_marker = ['def ', 'import ',]
 for sample in copy.deepcopy(unknown_pl_data):
     pl_name_in = guess_pl.language_name(sample['input']) if sample['input'] != "" else None
-    pl_name_out = guess_pl.language_name(sample['output'])
+    try:
+        pl_name_out = guess_pl.language_name(sample['output'])
+    except:
+        pl_name_out = None
     if pl_name_in == 'Python' or pl_name_out == 'Python' or any(marker in sample['output'] for marker in python_marker):
         python_default['Python'] += 1
         unknown_pl_data.remove(sample)
@@ -71,12 +96,11 @@ for sample in copy.deepcopy(unknown_pl_data):
 # print the statistic of PL
 python_default['Others'] = len(unknown_pl_data)
 print(python_default)
-print(sum(python_default.values()), len(unknown_pl_data))
 print(f"unknown PL num: {len(unknown_pl_data)}")
 print('before Python num: ', per_pl_num['Python'], ', after Python num: ', python_default['Python'])
 
 # record unknown PL data
-print(unknown_pl_data[:5])
+# print(unknown_pl_data[:5])
 json_data_object = json.dumps(unknown_pl_data, indent=6)
 with open("unknown_pl_data.json", "w") as outfile:
     outfile.write(json_data_object)
@@ -90,6 +114,7 @@ with open(f'codeup_{all_len}k.json', 'w') as f:
     f.write(clean_json_data)
 
 # save the number of each PL
-with open('pl_raw.json', 'w') as f_raw, open('pl_clean.json', 'w') as f_clean:
-    json.dump(per_pl_num, f_raw)
-    json.dump(python_default, f_clean)
+pl_dis = {"raw data": per_pl_num, "clean data": python_default}
+pl_dis_json = json.dumps(pl_dis, indent=6)
+with open(f'pl_num_dis_{all_len}k.json', 'w') as f:
+    f.write(pl_dis_json)

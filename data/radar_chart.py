@@ -5,10 +5,18 @@ import plotly.graph_objects as go
 import plotly.offline as pyo
 import json
 
-def draw_radar_chart(pl_num_dict):
+def draw_radar_chart(pl_num_dict, color):
+    print(pl_num_dict)
     fig = go.Figure(
         data=[
-            go.Scatterpolar(r=list(pl_num_dict.values()), theta=list(pl_num_dict.keys()), fill='toself', name='programming language'),
+            go.Scatterpolar(
+                r=list(pl_num_dict.values()), 
+                theta=list(pl_num_dict.keys()), 
+                fill='toself', 
+                name='programming language',
+                fillcolor=color,
+                line_color=color,
+            ),
         ],
         layout=go.Layout(
             title=go.layout.Title(text='The instruction number of per programming language'),
@@ -19,13 +27,9 @@ def draw_radar_chart(pl_num_dict):
     pyo.plot(fig)
 
 
-with open('pl_raw.json', 'r') as pl_raw, open('pl_clean.json', 'r') as pl_clean:
-    pl_raw = json.load(pl_raw).items() # key=lambda x:x[1], reverse=True)
-    pl_clean = json.load(pl_clean).items()
+with open('pl_num_dis_190k.json', 'r') as pl_dis:
+    pl_dis_data = json.load(pl_dis) 
 
-# print(pl_raw)
-# print(pl_clean)
-
-# draw_radar_chart(pl_raw)
-draw_radar_chart(pl_clean)
+# draw_radar_chart(pl_dis_data["raw data"], color='#e9c46a')
+draw_radar_chart(pl_dis_data["clean data"], color='#a2d2ff')
     

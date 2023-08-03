@@ -17,3 +17,8 @@ wandb/
 codeup-perf-**/runs/
 export_checkpoint/*
 CodeUp-Llama-2-7b**
+data/RombosCodeTraining112k.json
+data/codeup_190k.json
+data/romboscode_200k.json
+data/unknown_pl_data.json
+data/temp-plot**

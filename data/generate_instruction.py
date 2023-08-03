@@ -26,7 +26,7 @@ import fire
 
 def encode_prompt(prompt_instructions):
     """Encode multiple prompt instructions into a single string."""
-    prompt = open("./prompt.txt").read() + "\n"
+    prompt = open("./code_prompt.txt").read() + "\n"
 
     for idx, task_dict in enumerate(prompt_instructions):
         (instruction, input, output) = task_dict["instruction"], task_dict["input"], task_dict["output"]
@@ -109,7 +109,7 @@ def find_word_in_string(w, s):
 
 def generate_instruction_following_data(
     output_dir="./",
-    seed_tasks_path="./seed_tasks.jsonl",
+    seed_tasks_path="./code_seed_tasks.jsonl",
     num_instructions_to_generate=100,
     model_name="text-davinci-003",
     num_prompt_instructions=3,

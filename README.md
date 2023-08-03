@@ -13,6 +13,8 @@
 - [Overview](#overview)
 - [NL2Code Data Release](#nl2code-data-release)
     - [High-quality Data Filter](#high-quality-data-filter)
+        - [19K](#19k)
+        - [190K](#190k)
 - [Training (finetune.py)](#training-finetunepy)
 - [Inference (generate.py)](#inference-generatepy)
 - [Checkpoint Merge & Export](#checkpoint-merge--export)
@@ -67,12 +69,53 @@ Hence, we filter the ambiguous and irrelevant data by rigorous design to obtain 
 cd data
 python preprocess.py
 ```
-
+#### 19K
 This way, we gain the 19K high-quality instruction data of code generation. The following is the instruction number distribution of each PL with Radar visualization before and after filtering. 
 
 | Raw Data (20K + 4K)| Filtered Data (19K)  |
 | -- | -- |
 | <center><img src="./assets/PL_Raw.png" width="100%"></center>  | <center><img src="./assets/PL_Clean.png" width="92%"></center> | 
+
+```json
+{'JavaScript': 2393, 'Java': 1842, 'shell': 618, 'Python': 8693, 'C++/C': 1472, 'C#': 292, 'HTML': 1051, 'SQL': 1772, 'JSON': 206, 'CSS': 356, 'JSX': 2, 'Swift': 63, 'Ruby': 139, 'PHP': 326, 'Go': 34, 'Kotlin': 4, 'R': 89, 'MATLAB': 13, 'TypeScript': 7, 'Scala': 11, 'Haskell': 23, 'Perl': 16, 'Rust': 11}
+```
+
+Examples in `codeup_19k.json`:
+```json
+[
+      {
+            "instruction": "Write a function in HTML for creating a table of n rows and m columns.",
+            "input": "",
+            "output": "<table>\n  <tbody>\n    <% for (let i = 0; i < n; i++) { %>\n      <tr>\n        <% for (let j = 0; j < m; j++) { %>\n          <td>Cell Content</td>\n        <% } %>\n      </tr>\n    <% } %>\n  </tbody>\n</table>"
+      },
+...
+]
+```
+
+#### 190k 
+As seen above, the instruction number of some PLs is still limited. Hence, we curate the 190K high-quality instruction data derived from [`rombodawg/MegaCodeTraining112k`](https://huggingface.co/datasets/rombodawg/MegaCodeTraining112k) which is more complex and diverse. The following is the instruction number distribution of each PL with Radar visualization before and after filtering. 
+
+| MegaCodeTraining112k + Raw Data (200K + 24K)| Filtered Data (190K)  |
+| -- | -- |
+| <center><img src="./assets/PL_Raw_224k.png" width="100%"></center>  | <center><img src="./assets/PL_Clean_190k.png" width="92%"></center> | 
+
+```json
+{'JavaScript': 15676, 'Java': 13444, 'shell': 3612, 'Python': 73194, 'C++/C': 10744, 'C#': 6721, 'HTML': 9715, 'SQL': 16173, 'JSON': 6073, 'CSS': 2006, 'JSX': 9, 'Swift': 5111, 'Ruby': 5390, 'PHP': 4971, 'Go': 4879, 'Kotlin': 65, 'R': 4000, 'MATLAB': 5248, 'TypeScript': 198, 'Scala': 3130, 'Haskell': 101, 'Perl': 73, 'Rust': 129}
+```
+
+Examples in `codeup_190k.json`:
+```json
+[
+      {
+            "instruction": "Using a pseudo-random number generator, generate a 3 by 3 grid of non-repeating integers between 0 and 9, with each integer having an equal probability of being selected. Additionally, ensure that the sum of all integers in each row, column, and diagonal of the grid is not equal to any other row, column, or diagonal. Finally, output the resulting grid as a formatted table.",
+            "input": "",
+            "output": "Sure, here's the code to generate the grid:\n```python\nimport random\ndef generate_grid():\n grid = [[None] * 3 for _ in range(3)]\n rows = [set(range(10)) for _ in range(3)]\n cols = [set(range(10)) for _ in range(3)]\n diags = [set(range(10)) for _ in range(2)]\n \n for i in range(3):\n for j in range(3):\n valid_nums = rows[i].intersection(cols[j]).intersection(diags[0 if i == j else 1])\n num = random.choice(list(valid_nums))\n grid[i][j] = num\n rows[i].remove(num)\n cols[j].remove(num)\n diags[0 if i == j else 1].remove(num)\n \n return grid\n```\nTo output the resulting grid as a formatted table, you can use the following code:\n```python\ndef print_grid(grid):\n for row in grid:\n print(\"|\".join(str(num) for num in row))\n```\nYou can then call both functions to generate and print the grid:\n```python\ngrid = generate_grid()\nprint_grid(grid)\n```\nThis will output a 3x3 grid of non-repeating integers between 0 and 9, with each integer having an equal probability of being selected, and with each row, column, and diagonal having a unique sum."
+      },
+...
+]
+```
+
+### Full Prompt Input
 
 Furthermore, we follow the previous work to use the following prompts template `templates/alpaca.json` for fine-tuning the model. However, during inference (e.g., for the web demo), we use the user instruction with an empty input field (second option).
 
@@ -97,6 +140,13 @@ Furthermore, we follow the previous work to use the following prompts template `
  
  ### Response:
  ```
+
+```python
+# first option
+full_prompt = template["prompt_input"].format(instruction=instruction, input=input) + data_point["output"]
+# second option
+full_prompt = template["prompt_no_input"].format(instruction=instruction) + data_point["output"]
+```
 
 ## Training (`finetune.py`)
 To access Llama 2 model, please follow the [Download Guide](https://github.com/facebookresearch/llama/tree/main#download) and the difference between two versions of LLaMA can be found in [Model Card](https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md).
