@@ -29,7 +29,7 @@
     - [Papers](#papers)
 
 ## TODO
-- [ ] Retrain CodeUp on [`rombodawg/MegaCodeTraining112k`](https://huggingface.co/datasets/rombodawg/MegaCodeTraining112k) data.
+- [ ] Retrain CodeUp on [`rombodawg/MegaCodeTraining112k`](https://huggingface.co/datasets/rombodawg/MegaCodeTraining112k) data. (Running)
 - [ ] Report comprehensive code generation performance on a variety of programming language.
 
 ## Overview
@@ -97,7 +97,7 @@ As seen above, the instruction number of some PLs is still limited. Hence, we cu
 
 | MegaCodeTraining112k + Raw Data (200K + 24K)| Filtered Data (190K)  |
 | -- | -- |
-| <center><img src="./assets/PL_Raw_224k.png" width="100%"></center>  | <center><img src="./assets/PL_Clean_190k.png" width="92%"></center> | 
+| <center><img src="./assets/PL_Raw_224k.png" width="78%"></center>  | <center><img src="./assets/PL_Clean_190k.png" width="100%"></center> | 
 
 ```json
 {'JavaScript': 15676, 'Java': 13444, 'shell': 3612, 'Python': 73194, 'C++/C': 10744, 'C#': 6721, 'HTML': 9715, 'SQL': 16173, 'JSON': 6073, 'CSS': 2006, 'JSX': 9, 'Swift': 5111, 'Ruby': 5390, 'PHP': 4971, 'Go': 4879, 'Kotlin': 65, 'R': 4000, 'MATLAB': 5248, 'TypeScript': 198, 'Scala': 3130, 'Haskell': 101, 'Perl': 73, 'Rust': 129}
