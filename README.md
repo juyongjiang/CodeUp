@@ -1,4 +1,4 @@
-<p align="center" width="100%">
+<p align="center" width="90%">
 <img src="assets/codeup_logo.jpeg" alt="HKUST CodeUp" style="width: 50%; min-width: 250px; display: block; margin: auto;">
 </p>
 
@@ -53,7 +53,6 @@
 ## Introduction
 In recent years, large language models (LLMs) have demonstrated exceptional capabilities across a wide range of applications, largely due to their remarkable emergent abilities. To better align these models with human preferences, techniques such as instruction-tuning and reinforcement learning from human feedback (RLHF) have been developed for chat-based LLMs, including models like ChatGPT and GPT-4. However, except for Codex, these general-purpose LLMs primarily focus on general domains and are not specifically optimized for coding tasks. Codex, while a viable option, is a closed-source model developed by OpenAI. This underscores the need for developing open-source, instruction-following LLMs tailored to the code domain.
 The development of such models, however, faces significant challenges due to the extensive number of parameters (≥ 7 billion) and the vast datasets required for training. These factors demand substantial computational resources, which can hinder training and inference on consumer hardware.
-
 To address these challenges, our project leverages the latest powerful foundation model, `Llama` with version `X`, termed `Llama-X`, to construct high-quality instruction-following datasets for code generation tasks. We propose the development of an instruction-following multilingual code generation model based on Llama-X. 
 To ensure that our approach is feasible within an academic budget and can be executed on consumer hardware, such as a single RTX 3090, we are inspired by Alpaca-LoRA to integrate advanced parameter-efficient fine-tuning (PEFT) methods like `LoRA` for the code domain. 
 These methods facilitate the efficient adaptation of pre-trained language models (PLMs, also known as foundation models) to various downstream applications without the need to fine-tune the entire model's parameters. 
@@ -61,40 +60,30 @@ These methods facilitate the efficient adaptation of pre-trained language models
 
 
 ## Prompt Template
-We follow the previous work to use the following prompts template `templates/alpaca.json` for instruction-tuning the model. However, during inference (e.g., for the web demo), we use the user instruction with an empty input field (second option).
 
-- Non-empty input field:
- ```
- Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
- 
- ### Instruction:
- {instruction}
- 
- ### Input:
- {input}
- 
- ### Response:
- ```
-- Empty input field:
- ```
- Below is an instruction that describes a task. Write a response that appropriately completes the request.
- 
- ### Instruction:
- {instruction}
- 
- ### Response:
- ```
+In line with previous research, we use the prompt template found in `templates/alpaca.json` for instruction-tuning the model for code generation. However, during inference, such as in the web demo, we utilize the user's instruction with an empty input field.
+
+```
+Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+
+### Instruction:
+{instruction}
+
+### Input:
+{input}
+
+### Response:
+```
 
 ## Training (`finetune.py`)
-To access `Llama-X` model, please follow the [Download Guide](https://github.com/facebookresearch/llama/tree/main#download) and the difference between two versions of LLaMA can be found in [Model Card](https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md).
 
-To reproduce our fine-tuning runs for CodeUp, first, install the dependencies.
+To access the `Llama-X` model, please refer to the [Download Guide](https://github.com/facebookresearch/llama/tree/main#download). To replicate our fine-tuning runs for CodeUp, start by installing the necessary dependencies.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-The `finetune.py` file contains a straightforward application of [PEFT](https://github.com/huggingface/peft) to the Llama-X model, as well as some code related to prompt construction and tokenization.
+The `finetune.py` file includes a basic implementation of [PEFT](https://github.com/huggingface/peft) applied to the `Llama-X` model, along with additional code for prompt construction and tokenization.
 
 ```bash
 python finetune.py \
@@ -119,7 +108,8 @@ python finetune.py \
 ```
 
 ## Inference (`generate.py`)
-This file reads the foundation model (i.e., Llama2 7B) from the Hugging Face model hub and the LoRA weights from `codeup-peft-llama-2/7b`, and runs a `Gradio interface` for inference on a specified input. Users should treat this as an example code for using the model and modify it as needed.
+
+This script loads the foundation model from the Hugging Face model hub and retrieves the LoRA weights from `codeup-peft-llama-2/7b`. It then sets up a `Gradio interface` to perform inference on a given input. This example code is intended for demonstration purposes, and users are encouraged to modify it according to their needs.
 
 ```bash
 python generate.py \
@@ -129,24 +119,27 @@ python generate.py \
 ```
 
 ## Evaluation
-We use the open-source framework [Code Generation LM Evaluation Harness](https://github.com/bigcode-project/bigcode-evaluation-harness) developed by BigCode team to evaluate our CodeUp performance.
+
+We utilize the open-source framework [Code Generation LM Evaluation Harness](https://github.com/bigcode-project/bigcode-evaluation-harness), developed by the BigCode team, to assess the performance of CodeUp.
 
 ### Setup
+
 ```bash
 git clone https://github.com/bigcode-project/bigcode-evaluation-harness.git
 cd bigcode-evaluation-harness
 pip install -e .
-```
-Also make sure you have `git-lfs`` installed (above guide) and are logged in the Hub
-```bash
+# login HuggingFace
 huggingface-cli login
 ```
+
 ### Usage
-You can use this evaluation framework to generate text solutions to code benchmarks with any autoregressive model available on [Hugging Face hub](https://huggingface.co/), to evaluate (and execute) the solutions or to do both. While it is better to use GPUs for the generation, the evaluation only requires CPUs. So it might be beneficial to separate these two steps (i.e., `--generation_only` or `--load_generations_path`). By default both generation and evaluation are performed.
 
-For more details on how to evaluate on the various tasks (i.e., benchmark), please refer to the documentation in [`bigcode-evaluation-harness/docs/README.md`](https://github.com/bigcode-project/bigcode-evaluation-harness/blob/main/docs/README.md). 
+You can utilize this evaluation framework to generate text solutions for code benchmarks using any autoregressive model available on the [Hugging Face hub](https://huggingface.co/). 
+This framework allows you to either evaluate (and execute) the solutions, generate them, or perform both tasks. Although using GPUs is recommended for the generation process, evaluation only requires CPUs. Thus, it might be advantageous to separate these two steps using options like `--generation_only` or `--load_generations_path`. By default, both generation and evaluation are executed.
 
-Below is an example of CodeUp to `generate and evaluate` on a `multiple-py` task (i.e., benchmark), which denotes `HumanEval` benchmark is translated into 18 programming languages.
+For more detailed instructions on evaluating various tasks (i.e., benchmarks), please refer to the documentation in [`bigcode-evaluation-harness/docs/README.md`](https://github.com/bigcode-project/bigcode-evaluation-harness/blob/main/docs/README.md). 
+
+Below is an example of how to use CodeUp to both `generate and evaluate` on a `multiple-py` task, where the `HumanEval` benchmark has been translated into 18 different programming languages.
 
 ```bash
 accelerate launch  main.py \
