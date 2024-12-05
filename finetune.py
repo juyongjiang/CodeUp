@@ -286,6 +286,7 @@ def train(
     if not os.path.exists(merged_output_dir):
         os.makedirs(merged_output_dir)
     model.save_pretrained(merged_output_dir)
+    tokenizer.save_pretrained(merged_output_dir)
     print("Merged model saved successfully!")
 
     print(

@@ -139,8 +139,6 @@ We utilize the open-source framework [Code Generation LM Evaluation Harness](htt
 git clone https://github.com/bigcode-project/bigcode-evaluation-harness.git
 cd bigcode-evaluation-harness
 pip install -e .
-# login HuggingFace
-huggingface-cli login
 ```
 
 ### Usage
@@ -154,15 +152,16 @@ Below is an example of how to use CodeUp to both `generate and evaluate` on a `m
 
 ```bash
 accelerate launch  main.py \
-  --model deepse/CodeUp-Llama-2-7b-hf \
+  --model /hpc2hdd/home/jjiang472/CodeUp/codeup-peft-llama-3-8b/merged \
   --tasks multiple-py \
   --max_length_generation 650 \
   --temperature 0.8 \
   --do_sample True \
   --n_samples 200 \
   --batch_size 200 \
-  --allow_code_execution \
-  --save_generations
+  --generation_only \
+  --save_generations \
+  --save_generations_path generations_multiple-py.json
 ```
 
 * `--model` can be any autoregressive model available on [Hugging Face hub](https://huggingface.co/) can be used, but we recommend using code generation models trained specifically on Code such as [SantaCoder](https://huggingface.co/bigcode/santacoder), [InCoder](https://huggingface.co/facebook/incoder-6B) and [CodeGen](https://huggingface.co/Salesforce/codegen-16B-mono).
