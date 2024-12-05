@@ -1,8 +1,8 @@
 <p align="center" width="100%">
-<img src="assets/Logo.jpg" alt="HKUST CodeUp" style="width: 50%; min-width: 250px; display: block; margin: auto;">
+<img src="assets/codeup_logo.jpeg" alt="HKUST CodeUp" style="width: 50%; min-width: 250px; display: block; margin: auto;">
 </p>
 
-# CodeUp: A Multilingual Code Generation Llama2 Model with Parameter-Efficient Instruction-Tuning
+# CodeUp: A Multilingual Code Generation Llama-X Model with Parameter-Efficient Instruction-Tuning
 
 [![Code License](https://img.shields.io/badge/Code%20License-Apache_2.0-green.svg)](https://github.com/juyongjiang/CodeUp/blob/master/LICENSE)
 [![Data License](https://img.shields.io/badge/Data%20License-CC%20By%20NC%204.0-red.svg)](https://github.com/juyongjiang/CodeUp/blob/master/data/DATA_LICENSE)
@@ -10,116 +10,60 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Table of Contents
-- [Overview](#overview)
-- [NL2Code Data Release](#nl2code-data-release)
-    - [High-quality Data Filter](#high-quality-data-filter)
-        - [19K](#19k)
-        - [190K](#190k)
-- [Training (finetune.py)](#training-finetunepy)
-- [Inference (generate.py)](#inference-generatepy)
-- [Checkpoint Merge & Export](#checkpoint-merge--export)
-- [Evaluation](#evaluation)
-- [Useful Resources](#useful-resources)
+- [CodeUp: A Multilingual Code Generation Llama-X Model with Parameter-Efficient Instruction-Tuning](#codeup-a-multilingual-code-generation-llama-x-model-with-parameter-efficient-instruction-tuning)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Prompt Template](#prompt-template)
+  - [Training (`finetune.py`)](#training-finetunepy)
+  - [Inference (`generate.py`)](#inference-generatepy)
+  - [Evaluation](#evaluation)
+    - [Setup](#setup)
+    - [Usage](#usage)
+  - [Useful Resources](#useful-resources)
     - [LLMs](#llms)
     - [CPU Running](#cpu-running)
     - [Interface](#interface)
     - [Dataset](#dataset)
-    - [Evaluation](#evaluation)
+    - [Evaluation](#evaluation-1)
     - [Hugging Face](#hugging-face)
     - [Papers](#papers)
 
-## TODO
-- [ ] Retrain CodeUp on [`rombodawg/MegaCodeTraining112k`](https://huggingface.co/datasets/rombodawg/MegaCodeTraining112k) data. (Running)
-- [ ] Report comprehensive code generation performance on a variety of programming language.
+> [!IMPORTANT]
+> 
+> If you use the data or code in this repo, please cite the repo.
 
-## Overview
-In recent years, large language models (LLMs) have shown exceptional capabilities in a wide range of applications due to their fantastic emergence ability. To align with human preference, instruction-tuning and reinforcement learning from human feedback (RLHF) are proposed for Chat-based LLMs (e.g., ChatGPT, GPT-4). However, these LLMs (except for Codex) primarily focus on the general domain and are not specifically designed for the code domain. Although Codex provides an alternative choice, it is a closed-source model developed by OpenAI. Hence, it is imperative to develop open-source instruction-following LLMs for the code domain. 
-However, the large-scale number of LLMs' parameters ($\ge$7B) and training datasets require a vast amount of computational resources, which significantly impedes the development of training and inference on consumer hardware. 
-
-To handle these challenges, in this project, we adopt the latest powerful foundation model `Llama 2` and construct high-quality instruction-following data for code generation tasks, and propose an instruction-following multilingual code generation Llama2 model. Meanwhile, to make it fit an academic budget and consumer hardware (e.g., a single RTX 3090) based on `Alpaca-LoRA`, we equip `CodeUp` with the advanced parameter-efficient fine-tuning (PEFT) methods (e.g., [LoRA](https://arxiv.org/abs/2106.09685)) which enable efficient adaptation of pre-trained language models (PLMs, also known as foundation model) to various downstream applications without fine-tuning the entire model's parameters. The overall training recipe is as follows. 
-<center><img src="./assets/Framework_2.jpg" width="100%"></center>
-
-In summary, the repo contains:
-
-- The [19K high-quality instruction-following data](./data/codeup_19k.json) used for fine-tuning code generation model.
-- The code for [selecting high-quality instruction data](#high-quality-data-filter) from Code Alpaca.
-- The code for [efficiently fine-tuning the model](#training-finetunepy) on a single RTX 3090.
-- The code for [running a Gradio interface for model inference](#inference-generatepy)
-- The code for [running the model locally on CPU device](#checkpoint-export-utilsexport__checkpointpy) 
-<!-- the model is quantified on fp16 or int4 in purely C++.  -->
-
-
-## NL2Code Data Release
-Recently, it has attracted significant attention to exploiting much larger and more powerful LLMs (e.g., ChatGPT, GPT-4) to self-generate instruction-following data by delicate prompt design. However, many approaches primarily focus on the general domain and lack code-specific domain considerations. To this end, [Code Alpaca](https://github.com/sahil280114/codealpaca) follows the previous Self-Instruct paper [3] and [Stanford Alpaca repo](https://github.com/tatsu-lab/stanford_alpaca) with some code-related modifications to conduct 20K instruction-following data `data/code_alpaca_20k.json` for code generation tasks. This `JSON` file following `alpaca_data.json` format is a list of dictionaries; each dictionary contains the following fields:
-
-- `instruction`: `str`, describes the task the model should perform. Each of the 20K instructions is unique.
-- `input`: `str`, optional context or input for the task. For example, when the instruction is "Amend the following SQL query to select distinct elements", the input is the SQL query. Around 40% of the examples have an input.
-- `output`: `str`, the answer to the instruction as generated by `text-davinci-003`.
-
-### High-quality Data Filter
-However, after carefully checking the LLMs-self-generated data, we observe three critical problems that may hinder LLMs' instruction learning due to ambiguous and irrelevant noise. That is 
-
-1. When `instruction` doesn't specify the programming language (PL) of implementation, the `output` appears with diverse options, e.g., Python, C++, and JavaScript.
-2. It is ambiguous to identify which programming language `output` is implemented by.
-3. Both `instruction` and `output` are irrelevant to the code-specific domain. 
-
-Hence, we filter the ambiguous and irrelevant data by rigorous design to obtain high-quality instruction data. Specifically, to solve 1) we set Python as the default PL of implementation and use [Guesslang](https://guesslang.readthedocs.io/en/latest/) package to detect the PL of a given source code in `output`. If the Python is detected, this prompt is retained. Otherwise, it will be filtered. 2) and 3) In these cases, we delete these prompts. After that, about 5K low-quality instruction data is filtered. To supplement the high-quality instruction data, we further integrate the `data/new_codealpaca.json` data (about 4.5K) under the above filter rules. To achieve this, please run the following command:
-
-```bash
-cd data
-python preprocess.py
 ```
-#### 19K
-This way, we gain the 19K high-quality instruction data of code generation. The following is the instruction number distribution of each PL with Radar visualization before and after filtering. 
+@misc{codeup,
+  author = {Juyong Jiang and Sunghun Kim},
+  title = {CodeUp: A Multilingual Code Generation Llama-X Model with Parameter-Efficient Instruction-Tuning},
+  year = {2023},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/juyongjiang/CodeUp}},
+}
 
-| Raw Data (20K + 4K)| Filtered Data (19K)  |
-| -- | -- |
-| <center><img src="./assets/PL_Raw.png" width="100%"></center>  | <center><img src="./assets/PL_Clean.png" width="92%"></center> | 
-
-```json
-{'JavaScript': 2393, 'Java': 1842, 'shell': 618, 'Python': 8693, 'C++/C': 1472, 'C#': 292, 'HTML': 1051, 'SQL': 1772, 'JSON': 206, 'CSS': 356, 'JSX': 2, 'Swift': 63, 'Ruby': 139, 'PHP': 326, 'Go': 34, 'Kotlin': 4, 'R': 89, 'MATLAB': 13, 'TypeScript': 7, 'Scala': 11, 'Haskell': 23, 'Perl': 16, 'Rust': 11}
+@article{jiang2024survey,
+  title={A Survey on Large Language Models for Code Generation},
+  author={Jiang, Juyong and Wang, Fan and Shen, Jiasi and Kim, Sungju and Kim, Sunghun},
+  journal={arXiv preprint arXiv:2406.00515},
+  year={2024}
+}
 ```
 
-Examples in `codeup_19k.json`:
-```json
-[
-      {
-            "instruction": "Write a function in HTML for creating a table of n rows and m columns.",
-            "input": "",
-            "output": "<table>\n  <tbody>\n    <% for (let i = 0; i < n; i++) { %>\n      <tr>\n        <% for (let j = 0; j < m; j++) { %>\n          <td>Cell Content</td>\n        <% } %>\n      </tr>\n    <% } %>\n  </tbody>\n</table>"
-      },
-...
-]
-```
+## Introduction
+In recent years, large language models (LLMs) have demonstrated exceptional capabilities across a wide range of applications, largely due to their remarkable emergent abilities. To better align these models with human preferences, techniques such as instruction-tuning and reinforcement learning from human feedback (RLHF) have been developed for chat-based LLMs, including models like ChatGPT and GPT-4. However, except for Codex, these general-purpose LLMs primarily focus on general domains and are not specifically optimized for coding tasks. Codex, while a viable option, is a closed-source model developed by OpenAI. This underscores the need for developing open-source, instruction-following LLMs tailored to the code domain.
+The development of such models, however, faces significant challenges due to the extensive number of parameters (≥ 7 billion) and the vast datasets required for training. These factors demand substantial computational resources, which can hinder training and inference on consumer hardware.
 
-#### 190k 
-As seen above, the instruction number of some PLs is still limited. Hence, we curate the 190K high-quality instruction data derived from [`rombodawg/MegaCodeTraining112k`](https://huggingface.co/datasets/rombodawg/MegaCodeTraining112k) which is more complex and diverse. The following is the instruction number distribution of each PL with Radar visualization before and after filtering. 
+To address these challenges, our project leverages the latest powerful foundation model, `Llama` with version `X`, termed `Llama-X`, to construct high-quality instruction-following datasets for code generation tasks. We propose the development of an instruction-following multilingual code generation model based on Llama-X. 
+To ensure that our approach is feasible within an academic budget and can be executed on consumer hardware, such as a single RTX 3090, we are inspired by Alpaca-LoRA to integrate advanced parameter-efficient fine-tuning (PEFT) methods like `LoRA` for the code domain. 
+These methods facilitate the efficient adaptation of pre-trained language models (PLMs, also known as foundation models) to various downstream applications without the need to fine-tune the entire model's parameters. 
+<!-- Our overall training strategy is outlined as follows. -->
 
-| MegaCodeTraining112k + Raw Data (200K + 24K)| Filtered Data (190K)  |
-| -- | -- |
-| <center><img src="./assets/PL_Raw_224k.png" width="80%"></center>  | <center><img src="./assets/PL_Clean_190k.png" width="100%"></center> | 
 
-```json
-{'JavaScript': 15676, 'Java': 13444, 'shell': 3612, 'Python': 73194, 'C++/C': 10744, 'C#': 6721, 'HTML': 9715, 'SQL': 16173, 'JSON': 6073, 'CSS': 2006, 'JSX': 9, 'Swift': 5111, 'Ruby': 5390, 'PHP': 4971, 'Go': 4879, 'Kotlin': 65, 'R': 4000, 'MATLAB': 5248, 'TypeScript': 198, 'Scala': 3130, 'Haskell': 101, 'Perl': 73, 'Rust': 129}
-```
+## Prompt Template
+We follow the previous work to use the following prompts template `templates/alpaca.json` for instruction-tuning the model. However, during inference (e.g., for the web demo), we use the user instruction with an empty input field (second option).
 
-Examples in `codeup_190k.json`:
-```json
-[
-      {
-            "instruction": "Using a pseudo-random number generator, generate a 3 by 3 grid of non-repeating integers between 0 and 9, with each integer having an equal probability of being selected. Additionally, ensure that the sum of all integers in each row, column, and diagonal of the grid is not equal to any other row, column, or diagonal. Finally, output the resulting grid as a formatted table.",
-            "input": "",
-            "output": "Sure, here's the code to generate the grid:\n```python\nimport random\ndef generate_grid():\n grid = [[None] * 3 for _ in range(3)]\n rows = [set(range(10)) for _ in range(3)]\n cols = [set(range(10)) for _ in range(3)]\n diags = [set(range(10)) for _ in range(2)]\n \n for i in range(3):\n for j in range(3):\n valid_nums = rows[i].intersection(cols[j]).intersection(diags[0 if i == j else 1])\n num = random.choice(list(valid_nums))\n grid[i][j] = num\n rows[i].remove(num)\n cols[j].remove(num)\n diags[0 if i == j else 1].remove(num)\n \n return grid\n```\nTo output the resulting grid as a formatted table, you can use the following code:\n```python\ndef print_grid(grid):\n for row in grid:\n print(\"|\".join(str(num) for num in row))\n```\nYou can then call both functions to generate and print the grid:\n```python\ngrid = generate_grid()\nprint_grid(grid)\n```\nThis will output a 3x3 grid of non-repeating integers between 0 and 9, with each integer having an equal probability of being selected, and with each row, column, and diagonal having a unique sum."
-      },
-...
-]
-```
-
-### Full Prompt Input
-
-Furthermore, we follow the previous work to use the following prompts template `templates/alpaca.json` for fine-tuning the model. However, during inference (e.g., for the web demo), we use the user instruction with an empty input field (second option).
-
-- for examples with a non-empty input field:
+- Non-empty input field:
  ```
  Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
  
@@ -131,7 +75,7 @@ Furthermore, we follow the previous work to use the following prompts template `
  
  ### Response:
  ```
-- for examples with an empty input field:
+- Empty input field:
  ```
  Below is an instruction that describes a task. Write a response that appropriately completes the request.
  
@@ -141,15 +85,8 @@ Furthermore, we follow the previous work to use the following prompts template `
  ### Response:
  ```
 
-```python
-# first option
-full_prompt = template["prompt_input"].format(instruction=instruction, input=input) + data_point["output"]
-# second option
-full_prompt = template["prompt_no_input"].format(instruction=instruction) + data_point["output"]
-```
-
 ## Training (`finetune.py`)
-To access Llama 2 model, please follow the [Download Guide](https://github.com/facebookresearch/llama/tree/main#download) and the difference between two versions of LLaMA can be found in [Model Card](https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md).
+To access `Llama-X` model, please follow the [Download Guide](https://github.com/facebookresearch/llama/tree/main#download) and the difference between two versions of LLaMA can be found in [Model Card](https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md).
 
 To reproduce our fine-tuning runs for CodeUp, first, install the dependencies.
 
@@ -157,108 +94,28 @@ To reproduce our fine-tuning runs for CodeUp, first, install the dependencies.
 pip install -r requirements.txt
 ```
 
-The `finetune.py` file contains a straightforward application of [PEFT](https://github.com/huggingface/peft) to the Llama 2 model, as well as some code related to prompt construction and tokenization.
+The `finetune.py` file contains a straightforward application of [PEFT](https://github.com/huggingface/peft) to the Llama-X model, as well as some code related to prompt construction and tokenization.
 
 ```bash
 python finetune.py \
-    --base_model 'meta-llama/Llama-2-7b-hf' \
-    --data_path 'data/codeup_19k.json' \
-    --output_dir './codeup-peft-llama-2/7b' \
-    --batch_size 128 \
-    --micro_batch_size 4 \
-    --num_epochs 1 \
-    --learning_rate 1e-4 \
-    --cutoff_len 512 \
-    --val_set_size 2000 \
-    --lora_r 8 \
-    --lora_alpha 16 \
-    --lora_dropout 0.05 \
-    --lora_target_modules '[q_proj,v_proj]' \
-    --train_on_inputs \
-    --group_by_length
-```
-Note that gradient accumulation steps equals `batch_size // micro_batch_size`.
-
-However, the latest CodeUp-7B model (`codeup-peft-llama-2/7b`) was fine-tuned on a single NVIDIA GeForce RTX 3090 24GB memory on July 28 for 11 hours with the following command:
-
-```bash
-python finetune.py \
-    --base_model='meta-llama/Llama-2-7b-hf' \
+    --base_model='meta-llama/Meta-Llama-3-8B' \
     --data_path='data/codeup_19k.json' \
+    --output_dir='codeup-peft-llama-3-8b' \
+    --batch_size=128 \
+    --micro_batch_size=4 \
     --num_epochs=10 \
-    --cutoff_len=512 \
-    --group_by_length \
-    --output_dir='./codeup-peft-llama-2/7b' \
-    --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
+    --learning_rate=3e-4 \
+    --val_set_size=2000 \
+    --cutoff_len=1024 \
     --lora_r=16 \
-    --micro_batch_size=16
-``` 
+    --lora_alpha=32 \
+    --lora_dropout=0.05 \
+    --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
+    --train_on_inputs \
+    --group_by_length \
+    --resume_from_checkpoint='meta-llama/Meta-Llama-3-8B' \
+    --prompt_template_name='alpaca'
 
-or 
-
-```bash
-bash run_codeup_llama-2.sh # run_codeup_llama.sh for LLaMA V1
-```
-
-| train/loss | eval/loss  |
-| -- | -- |
-| <center><img src="./assets/train_loss.png" width="100%"></center>  | <center><img src="./assets/eval_loss.png" width="100%"></center> | 
-
-**Note that** if you meet the following `OSError`:
-
-```bash
-raise EnvironmentError(
-OSError: meta-llama/Llama-2-13b-chat-hf is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
-If this is a private repository, make sure to pass a token having permission to this repo with `use_auth_token` or log in with `huggingface-cli login` and pass `use_auth_token=True`.
-```
-
-You can solve this `Exception` as follows.
-
-Step 1:
-
-```bash
-git config --global credential.helper store
-huggingface-cli login
-```
-
-Step 2:
-
-Then, you can see the following prompt in your terminal:
-```bash
-$ huggingface-cli login
-
-    _|    _|  _|    _|    _|_|_|    _|_|_|  _|_|_|  _|      _|    _|_|_|      _|_|_|_|    _|_|      _|_|_|  _|_|_|_|
-    _|    _|  _|    _|  _|        _|          _|    _|_|    _|  _|            _|        _|    _|  _|        _|
-    _|_|_|_|  _|    _|  _|  _|_|  _|  _|_|    _|    _|  _|  _|  _|  _|_|      _|_|_|    _|_|_|_|  _|        _|_|_|
-    _|    _|  _|    _|  _|    _|  _|    _|    _|    _|    _|_|  _|    _|      _|        _|    _|  _|        _|
-    _|    _|    _|_|      _|_|_|    _|_|_|  _|_|_|  _|      _|    _|_|_|      _|        _|    _|    _|_|_|  _|_|_|_|
-    
-    To login, `huggingface_hub` requires a token generated from https://huggingface.co/settings/tokens .
-Token: 
-```
-
-Step 3:
-
-Click and open [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens), then copy `User Access Tokens` or create a new one. Note that as a prerequisite, you should already have access to Meta AI's [Llama2 download](https://github.com/facebookresearch/llama/tree/main#download).
-
-```bash
-Token has not been saved to git credential helper.
-Your token has been saved to /home/john/.cache/huggingface/token
-Login successful
-```
-
-After logining successfully, please rerun the above fine-tuning command. If you meet another bugs:
-
-```bash
-AttributeError: /home/xxx/lib/python3.8/site-packages/bitsandbytes/libbitsandbytes_cpu.so: undefined symbol: cget_col_row_stats
-```
-
-Please run the following commands to solve it. 
-
-```
-$ nvidia-smi # get CUDA Version of your system
-$ cd /home/xxx/lib/python3.8/site-packages/bitsandbytes
-$ cp libbitsandbytes_cudaxxx.so libbitsandbytes_cpu.so # replace `xxx` with your CUDA Version
 ```
 
 ## Inference (`generate.py`)
@@ -267,63 +124,9 @@ This file reads the foundation model (i.e., Llama2 7B) from the Hugging Face mod
 ```bash
 python generate.py \
     --load_8bit \
-    --base_model 'meta-llama/Llama-2-7b-hf' \
-    --lora_weights 'codeup-peft-llama-2/7b'
+    --base_model 'meta-llama/Meta-Llama-3-8B' \
+    --lora_weights 'codeup-peft-llama-3-8b'
 ```
-
-**Note that** if you meet the bug of `ImportError: cannot import name 'NotRequired' from 'typing_extensions'`, you can solve this as follows:
-```bash
-pip uninstall typing_extensions # upgrade 3.7.x to 4.7.x
-pip install typing_extensions
-```
-
-<center><img src="./assets/Interface.png" width="100%"></center>
-
-## Checkpoint Merge & Export
-This script `merge` the LoRA weights back into the base model for exporting to Hugging Face format or to PyTorch `state_dicts`, which help users who want to run inference in projects like [llama.cpp](https://github.com/ggerganov/llama.cpp) or [alpaca.cpp](https://github.com/antimatter15/alpaca.cpp), which can run LLM locally on your `CPU` device. After that, you can upload your model to Hugging Face Hub by `git`.
-
-
-```bash
-python export_checkpoint.py \
-    --base_model='meta-llama/Llama-2-7b-hf' \
-    --lora_weights='codeup-peft-llama-2/7b' \
-    --lora_target_modules='[q_proj,k_proj,v_proj,o_proj]' \
-    --export_dir='export_checkpoint/7b' \
-    --checkpoint_type='hf' # set to 'pytorch' if saved as state_dicts format of Pytorch 
-```
-
-**Note that** if you meet the following error when you upload large files by `git`, please make sure use [`Git LFS`](https://git-lfs.com/). Refer to [Uploading files larger than 5GB to model hub](https://discuss.huggingface.co/t/uploading-files-larger-than-5gb-to-model-hub/4081) and [git: 'lfs' is not a git command unclear](https://stackoverflow.com/questions/48734119/git-lfs-is-not-a-git-command-unclear)
-
-```bash
-error: RPC failed; HTTP 408 curl 22 The requested URL returned error: 408
-fatal: the remote end hung up unexpectedly
-Writing objects: 100% (54/54), 9.66 GiB | 7.72 MiB/s, done.
-Total 54 (delta 0), reused 0 (delta 0)
-fatal: the remote end hung up unexpectedly
-Everything up-to-date
-```
-<!-- git config --global http.postBuffer 12884901888 # 12GiB = 12 * 1024^3 -->
-<!-- huggingface-cli lfs-enable-largefiles -->
-```
-sudo apt-get install git-lfs
-git lfs install 
-huggingface-cli lfs-enable-largefiles .
-
-git lfs track "*.png"
-git lfs track "*.jpg"
-git add .gitattributes
-
-git add .
-git commit -m "codeup-llama-2-7b-hf"
-git push
-```
-
-Up to now, we have contributed [`CodeUp-Llama-2-7b-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-7b-hf), [`CodeUp-Llama-2-7b-chat-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-7b-chat-hf), [`CodeUp-Llama-2-13b-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-13b-hf), and [`CodeUp-Llama-2-13b-chat-hf`](https://huggingface.co/deepse/CodeUp-Llama-2-13b-chat-hf) for which we use `Llama-2-7b`, `Llama-2-7b-chat`, and `Llama-2-13b-chat` as foundation model respectively, to [Hugging Face Hub](https://huggingface.co/deepse). **The reason why we use `Llama-2-xx-chat`-based models, which have been trained on instruction-tuning (over 100K) and RLHF (over 1M), is to further enhance the understanding capability of instructions due to the `amount` and `diversity` limitation of our `codeup_19k.json`.**  
-
-<center><img src="./assets/hf_models.jpg" width="100%"></center>
-
-In summary, the individual LoRA weights can be found in [`codeup-peft-llama-2/7b`](./codeup-peft-llama-2/7b), [`codeup-peft-llama-2/7b-chat`](./codeup-peft-llama-2/7b-chat), [`codeup-peft-llama-2/13b`](./codeup-peft-llama-2/13b), and [`codeup-peft-llama-2/13b-chat`](./codeup-peft-llama-2/13b-chat), while the merged CodeUp weights (Llama 2 + LoRA weights) have been uploaded in [Hugging Face Hub](https://huggingface.co/deepse). **It is worthwhile to note that if you follow the steps of `Inference (`generate.py`)`, the inference can be conducted in a single RTX 3090 24GB. Otherwise, you need the standard GPUs memory of Llama 2 when you use the merged parameters from Hugging Face Hub.** 
-
 
 ## Evaluation
 We use the open-source framework [Code Generation LM Evaluation Harness](https://github.com/bigcode-project/bigcode-evaluation-harness) developed by BigCode team to evaluate our CodeUp performance.
@@ -427,6 +230,7 @@ In addition, we generate one candidate solution for each problem in these tasks,
 - [https://huggingface.co/chansung/gpt4-alpaca-lora-7b](https://huggingface.co/chansung/gpt4-alpaca-lora-7b)
 
 ### Papers
+- [A Survey on Large Language Models for Code Generation](https://arxiv.org/abs/2406.00515)
 - [A Survey of Large Language Models](https://arxiv.org/abs/2303.18223)
 - [Codex: Evaluating Large Language Models Trained on Code](https://arxiv.org/pdf/2107.03374)
 - [LLaMA: Open and Efficient Foundation Language Models](https://arxiv.org/abs/2302.13971v1)
@@ -443,18 +247,3 @@ In addition, we generate one candidate solution for each problem in these tasks,
 - [InCoder: A Generative Model for Code Infilling and Synthesis](https://arxiv.org/abs/2204.05999)
 - [CodeBERT: A Pre-Trained Model for Programming and Natural Languages](https://arxiv.org/abs/2002.08155)
 - [CodeXGLUE: A Machine Learning Benchmark Dataset for Code Understanding and Generation](https://arxiv.org/abs/2102.04664)
-
-## Citation
-If you use the data or code in this repo, please cite the repo.
-
-```
-@misc{codeup,
-  author = {Juyong Jiang and Sunghun Kim},
-  title = {CodeUp: A Multilingual Code Generation Llama2 Model with Parameter-Efficient Instruction-Tuning},
-  year = {2023},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/juyongjiang/CodeUp}},
-}
-```
-Naturally, you should also cite the original LLaMA V1 [1] & V2 paper [2], and the Self-Instruct paper [3], and the LoRA paper [4], and the [Stanford Alpaca repo](https://github.com/tatsu-lab/stanford_alpaca), and [Alpaca-LoRA repo](https://github.com/tloen/alpaca-lora), and [Code Alpaca repo](https://github.com/sahil280114/codealpaca), and [PEFT](https://github.com/huggingface/peft).

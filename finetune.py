@@ -19,8 +19,9 @@ from peft import (
     get_peft_model_state_dict,
     prepare_model_for_int8_training,
     set_peft_model_state_dict,
+    merge_and_unload
 )
-from transformers import LlamaForCausalLM, LlamaTokenizer
+from transformers import AutoModelForCausalLM, LlamaForCausalLM, LlamaTokenizer, AutoTokenizer
 
 from utils.prompter import Prompter
 
@@ -109,14 +110,19 @@ def train(
     if len(wandb_log_model) > 0:
         os.environ["WANDB_LOG_MODEL"] = wandb_log_model
 
-    model = LlamaForCausalLM.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         base_model,
         load_in_8bit=True,
         torch_dtype=torch.float16,
         device_map=device_map,
+        trust_remote_code=True
     )
 
-    tokenizer = LlamaTokenizer.from_pretrained(base_model)
+    if model.config.model_type == "llama" and 'llama-3' not in base_model.lower():
+        # Due to the name of transformers' LlamaTokenizer, we have to do this
+        tokenizer = LlamaTokenizer.from_pretrained(base_model, legacy=False)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 
     tokenizer.pad_token_id = (
         0  # unk. we want this to be different from the eos token
@@ -182,7 +188,7 @@ def train(
         task_type="CAUSAL_LM",
     )
     model = get_peft_model(model, config)
-
+    
     if data_path.endswith(".json") or data_path.endswith(".jsonl"):
         data = load_dataset("json", data_files=data_path)
     else:
@@ -273,6 +279,15 @@ def train(
     trainer.train(resume_from_checkpoint=resume_from_checkpoint)
 
     model.save_pretrained(output_dir)
+    print("Adapter model saved successfully!")
+
+    # Merge and save the model with the adapters
+    model = merge_and_unload(model)
+    merged_output_dir = os.path.join(output_dir, "merged")
+    if not os.path.exists(merged_output_dir):
+        os.makedirs(merged_output_dir)
+    model.save_pretrained(merged_output_dir)
+    print("Merged model saved successfully!")
 
     print(
         "\n If there's a warning about missing keys above, please disregard :)"
@@ -281,3 +296,4 @@ def train(
 
 if __name__ == "__main__":
     fire.Fire(train)
+    
