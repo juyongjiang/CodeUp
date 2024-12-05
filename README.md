@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-<img src="assets/codeup_logo.jpeg" alt="HKUST CodeUp" style="width: 30%; min-width: 250px; display: block; margin: auto;">
+<img src="assets/codeup_logo.jpeg" alt="HKUST CodeUp" style="width: 40%; min-width: 250px; display: block; margin: auto;">
 </p>
 
 # CodeUp: A Multilingual Code Generation Llama-X Model with Parameter-Efficient Instruction-Tuning
