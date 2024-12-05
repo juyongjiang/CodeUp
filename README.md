@@ -1,5 +1,5 @@
-<p align="center" width="90%">
-<img src="assets/codeup_logo.jpeg" alt="HKUST CodeUp" style="width: 50%; min-width: 250px; display: block; margin: auto;">
+<p align="center" width="100%">
+<img src="assets/codeup_logo.jpeg" alt="HKUST CodeUp" style="width: 30%; min-width: 250px; display: block; margin: auto;">
 </p>
 
 # CodeUp: A Multilingual Code Generation Llama-X Model with Parameter-Efficient Instruction-Tuning
@@ -10,23 +10,21 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Table of Contents
-- [CodeUp: A Multilingual Code Generation Llama-X Model with Parameter-Efficient Instruction-Tuning](#codeup-a-multilingual-code-generation-llama-x-model-with-parameter-efficient-instruction-tuning)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Prompt Template](#prompt-template)
-  - [Training (`finetune.py`)](#training-finetunepy)
-  - [Inference (`generate.py`)](#inference-generatepy)
-  - [Evaluation](#evaluation)
-    - [Setup](#setup)
-    - [Usage](#usage)
-  - [Useful Resources](#useful-resources)
-    - [LLMs](#llms)
-    - [CPU Running](#cpu-running)
-    - [Interface](#interface)
-    - [Dataset](#dataset)
-    - [Evaluation](#evaluation-1)
-    - [Hugging Face](#hugging-face)
-    - [Papers](#papers)
+- [Overview](#overview)
+- [Prompt Template](#prompt-template)
+- [Training (`finetune.py`)](#training-finetunepy)
+- [Inference (`generate.py`)](#inference-generatepy)
+- [Evaluation](#evaluation)
+  - [Setup](#setup)
+  - [Usage](#usage)
+- [Useful Resources](#useful-resources)
+  - [LLMs](#llms)
+  - [CPU Running](#cpu-running)
+  - [Interface](#interface)
+  - [Dataset](#dataset)
+  - [Evaluation](#evaluation-1)
+  - [Hugging Face](#hugging-face)
+  - [Papers](#papers)
 
 > [!IMPORTANT]
 > 
@@ -50,7 +48,7 @@
 }
 ```
 
-## Introduction
+## Overview
 In recent years, large language models (LLMs) have demonstrated exceptional capabilities across a wide range of applications, largely due to their remarkable emergent abilities. To better align these models with human preferences, techniques such as instruction-tuning and reinforcement learning from human feedback (RLHF) have been developed for chat-based LLMs, including models like ChatGPT and GPT-4. However, except for Codex, these general-purpose LLMs primarily focus on general domains and are not specifically optimized for coding tasks. Codex, while a viable option, is a closed-source model developed by OpenAI. This underscores the need for developing open-source, instruction-following LLMs tailored to the code domain.
 The development of such models, however, faces significant challenges due to the extensive number of parameters (≥ 7 billion) and the vast datasets required for training. These factors demand substantial computational resources, which can hinder training and inference on consumer hardware.
 To address these challenges, our project leverages the latest powerful foundation model, `Llama` with version `X`, termed `Llama-X`, to construct high-quality instruction-following datasets for code generation tasks. We propose the development of an instruction-following multilingual code generation model based on Llama-X. 
@@ -74,6 +72,10 @@ Below is an instruction that describes a task, paired with an input that provide
 
 ### Response:
 ```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
 
 ## Training (`finetune.py`)
 
@@ -107,6 +109,11 @@ python finetune.py \
 
 ```
 
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+
 ## Inference (`generate.py`)
 
 This script loads the foundation model from the Hugging Face model hub and retrieves the LoRA weights from `codeup-peft-llama-2/7b`. It then sets up a `Gradio interface` to perform inference on a given input. This example code is intended for demonstration purposes, and users are encouraged to modify it according to their needs.
@@ -117,6 +124,10 @@ python generate.py \
     --base_model 'meta-llama/Meta-Llama-3-8B' \
     --lora_weights 'codeup-peft-llama-3-8b'
 ```
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
 
 ## Evaluation
 
@@ -240,3 +251,12 @@ In addition, we generate one candidate solution for each problem in these tasks,
 - [InCoder: A Generative Model for Code Infilling and Synthesis](https://arxiv.org/abs/2204.05999)
 - [CodeBERT: A Pre-Trained Model for Programming and Natural Languages](https://arxiv.org/abs/2002.08155)
 - [CodeXGLUE: A Machine Learning Benchmark Dataset for Code Understanding and Generation](https://arxiv.org/abs/2102.04664)
+
+
+<div align="right">
+    <b><a href="#table-of-contents">↥ back to top</a></b>
+</div>
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=juyongjiang/CodeUp&type=Date)](https://star-history.com/#juyongjiang/CodeUp&Date)

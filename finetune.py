@@ -18,8 +18,7 @@ from peft import (
     get_peft_model,
     get_peft_model_state_dict,
     prepare_model_for_int8_training,
-    set_peft_model_state_dict,
-    merge_and_unload
+    set_peft_model_state_dict
 )
 from transformers import AutoModelForCausalLM, LlamaForCausalLM, LlamaTokenizer, AutoTokenizer
 
@@ -282,7 +281,7 @@ def train(
     print("Adapter model saved successfully!")
 
     # Merge and save the model with the adapters
-    model = merge_and_unload(model)
+    model = model.merge_and_unload()
     merged_output_dir = os.path.join(output_dir, "merged")
     if not os.path.exists(merged_output_dir):
         os.makedirs(merged_output_dir)
