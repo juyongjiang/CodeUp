@@ -1,4 +1,6 @@
 codeup-peft-**/merged/
+codeup-peft-**/runs/
+codeup-peft-**/checkpoint**/
 data/evol_codealpaca_v1_111k.json
 data/wizardlm_evol_instruct_v2_143k.json
 data/metamathqa_395k.json

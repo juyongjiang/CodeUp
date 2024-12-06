@@ -1,3 +1,0 @@
-data/evol_codealpaca_v1_111k.json filter=lfs diff=lfs merge=lfs -text
-data/metamathqa_395k.json filter=lfs diff=lfs merge=lfs -text
-data/wizardlm_evol_instruct_v2_143k.json filter=lfs diff=lfs merge=lfs -text
