@@ -1,16 +1,0 @@
-/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
-  torch.utils._pytree._register_pytree_node(
-The following values were not passed to `accelerate launch` and had defaults used instead:
-	`--num_processes` was set to a value of `1`
-	`--num_machines` was set to a value of `1`
-	`--mixed_precision` was set to a value of `'no'`
-	`--dynamo_backend` was set to a value of `'no'`
-To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
-/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
-  torch.utils._pytree._register_pytree_node(
-/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/utils/generic.py:311: UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
-  torch.utils._pytree._register_pytree_node(
-Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
-Selected Tasks: ['mbpp']
-Loading model in fp32
-Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]

@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-<img src="assets/codeup_logo.jpeg" alt="HKUST CodeUp" style="width: 40%; min-width: 250px; display: block; margin: auto;">
+<img src="assets/codeup_logo.jpeg" alt="HKUST CodeUp" style="width: 35%; min-width: 250px; display: block; margin: auto;">
 </p>
 
 # CodeUp: A Multilingual Code Generation Llama-X Model with Parameter-Efficient Instruction-Tuning
@@ -28,9 +28,9 @@
 
 > [!IMPORTANT]
 > 
-> If you use the data or code in this repo, please cite the repo.
+> If you use the data or code in this repo, please consider citing the following paper:
 
-```
+```BibTex
 @misc{codeup,
   author = {Juyong Jiang and Sunghun Kim},
   title = {CodeUp: A Multilingual Code Generation Llama-X Model with Parameter-Efficient Instruction-Tuning},
@@ -51,10 +51,27 @@
 ## Overview
 In recent years, large language models (LLMs) have demonstrated exceptional capabilities across a wide range of applications, largely due to their remarkable emergent abilities. To better align these models with human preferences, techniques such as instruction-tuning and reinforcement learning from human feedback (RLHF) have been developed for chat-based LLMs, including models like ChatGPT and GPT-4. However, except for Codex, these general-purpose LLMs primarily focus on general domains and are not specifically optimized for coding tasks. Codex, while a viable option, is a closed-source model developed by OpenAI. This underscores the need for developing open-source, instruction-following LLMs tailored to the code domain.
 The development of such models, however, faces significant challenges due to the extensive number of parameters (≥ 7 billion) and the vast datasets required for training. These factors demand substantial computational resources, which can hinder training and inference on consumer hardware.
+
 To address these challenges, our project leverages the latest powerful foundation model, `Llama` with version `X`, termed `Llama-X`, to construct high-quality instruction-following datasets for code generation tasks. We propose the development of an instruction-following multilingual code generation model based on Llama-X. 
 To ensure that our approach is feasible within an academic budget and can be executed on consumer hardware, such as a single RTX 3090, we are inspired by Alpaca-LoRA to integrate advanced parameter-efficient fine-tuning (PEFT) methods like `LoRA` for the code domain. 
 These methods facilitate the efficient adaptation of pre-trained language models (PLMs, also known as foundation models) to various downstream applications without the need to fine-tune the entire model's parameters. 
-<!-- Our overall training strategy is outlined as follows. -->
+
+The overall training pipeline for CodeUp is outlined as follows.
+
+<p align="center" width="100%">
+<img src="assets/codeup_pipeline.jpg" alt="HKUST CodeUp Pipeline" style="width: 100%; min-width: 250px; display: block; margin: auto;">
+</p>
+
+
+## Dataset Curation
+
+We employ three distinct datasets to specialize the Llama-X foundataion models for code generation:
+
+* **[WizardLMTeam/WizardLM_evol_instruct_V2_196k](https://huggingface.co/datasets/WizardLMTeam/WizardLM_evol_instruct_V2_196k)**: This dataset comprises 143k rows of evolved data from Alpaca and ShareGPT. Due to licensing requirements, you must merge the original ShareGPT data with this dataset to obtain the complete version, which will contain approximately 196k rows.
+
+* **[meta-math/MetaMathQA](https://huggingface.co/datasets/meta-math/MetaMathQA)**: The MetaMathQA dataset is augmented using the training sets from GSM8K and MATH, ensuring that no data from the testing sets is included.
+
+* **[theblackcat102/evol-codealpaca-v1](https://huggingface.co/datasets/theblackcat102/evol-codealpaca-v1)**: This dataset is developed using a methodology similar to WizardCoder, with the distinction that it is open-source. It leverages the gpt-4-0314 and gpt-4-0613 models for generating and answering responses, with the majority of the generation process being handled by gpt-4-0314.
 
 
 ## Prompt Template
