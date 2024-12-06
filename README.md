@@ -49,19 +49,17 @@
 ```
 
 ## Overview
-
-<p align="center" width="100%">
-<img src="assets/codeup_pipeline.jpg" alt="HKUST CodeUp Pipeline" style="width: 100%; min-width: 250px; display: block; margin: auto;">
-  <br>
-  The overall training pipeline for CodeUp.
-</p>
-
 In recent years, large language models (LLMs) have demonstrated exceptional capabilities across a wide range of applications, largely due to their remarkable emergent abilities. To better align these models with human preferences, techniques such as instruction-tuning and reinforcement learning from human feedback (RLHF) have been developed for chat-based LLMs, including models like ChatGPT and GPT-4. However, except for Codex, these general-purpose LLMs primarily focus on general domains and are not specifically optimized for coding tasks. Codex, while a viable option, is a closed-source model developed by OpenAI. This underscores the need for developing open-source, instruction-following LLMs tailored to the code domain.
 The development of such models, however, faces significant challenges due to the extensive number of parameters (≥ 7 billion) and the vast datasets required for training. These factors demand substantial computational resources, which can hinder training and inference on consumer hardware.
 
 To address these challenges, our project leverages the latest powerful foundation model, `Llama` with version `X`, termed `Llama-X`, to construct high-quality instruction-following datasets for code generation tasks. We propose the development of an instruction-following multilingual code generation model based on Llama-X. 
 To ensure that our approach is feasible within an academic budget and can be executed on consumer hardware, such as a single RTX 3090, we are inspired by Alpaca-LoRA to integrate advanced parameter-efficient fine-tuning (PEFT) methods like `LoRA` for the code domain. 
 These methods facilitate the efficient adaptation of pre-trained language models (PLMs, also known as foundation models) to various downstream applications without the need to fine-tune the entire model's parameters. 
+The overall training pipeline for CodeUp is outlined as follows.
+
+<p align="center" width="100%">
+<img src="assets/codeup_pipeline.jpg" alt="HKUST CodeUp Pipeline" style="width: 100%; min-width: 250px; display: block; margin: auto;">
+</p>
 
 
 ## Dataset Curation
