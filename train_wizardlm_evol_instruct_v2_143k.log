@@ -1677,4 +1677,73 @@ You're using a PreTrainedTokenizerFast tokenizer. Please note that with a fast t
  98%|█████████▊| 3270/3348 [11:28:51<12:11,  9.38s/it] 98%|█████████▊| 3271/3348 [11:29:19<18:52, 14.71s/it] 98%|█████████▊| 3272/3348 [11:29:33<18:30, 14.61s/it] 98%|█████████▊| 3273/3348 [11:29:45<17:09, 13.72s/it] 98%|█████████▊| 3274/3348 [11:29:54<15:27, 12.53s/it] 98%|█████████▊| 3275/3348 [11:30:02<13:38, 11.21s/it] 98%|█████████▊| 3276/3348 [11:30:08<11:29,  9.58s/it] 98%|█████████▊| 3277/3348 [11:30:43<20:21, 17.21s/it] 98%|█████████▊| 3278/3348 [11:30:58<19:13, 16.48s/it] 98%|█████████▊| 3279/3348 [11:31:10<17:21, 15.09s/it] 98%|█████████▊| 3280/3348 [11:31:20<15:32, 13.71s/it]                                                      {'loss': 0.8294, 'learning_rate': 0.0002832820197044335, 'epoch': 2.94}
  98%|█████████▊| 3280/3348 [11:31:20<15:32, 13.71s/it] 98%|█████████▊| 3281/3348 [11:31:29<13:40, 12.24s/it] 98%|█████████▊| 3282/3348 [11:31:36<11:33, 10.51s/it] 98%|█████████▊| 3283/3348 [11:32:05<17:37, 16.27s/it] 98%|█████████▊| 3284/3348 [11:32:22<17:24, 16.32s/it] 98%|█████████▊| 3285/3348 [11:32:34<15:57, 15.20s/it] 98%|█████████▊| 3286/3348 [11:32:45<14:17, 13.82s/it] 98%|█████████▊| 3287/3348 [11:32:54<12:33, 12.35s/it] 98%|█████████▊| 3288/3348 [11:33:01<10:43, 10.72s/it] 98%|█████████▊| 3289/3348 [11:33:17<12:15, 12.47s/it] 98%|█████████▊| 3290/3348 [11:33:36<13:55, 14.40s/it]                                                      {'loss': 0.8456, 'learning_rate': 0.0002832820197044335, 'epoch': 2.95}
  98%|█████████▊| 3290/3348 [11:33:36<13:55, 14.40s/it] 98%|█████████▊| 3291/3348 [11:33:50<13:27, 14.16s/it] 98%|█████████▊| 3292/3348 [11:34:01<12:22, 13.27s/it] 98%|█████████▊| 3293/3348 [11:34:11<11:09, 12.17s/it] 98%|█████████▊| 3294/3348 [11:34:19<09:49, 10.92s/it] 98%|█████████▊| 3295/3348 [11:34:24<08:10,  9.25s/it] 98%|█████████▊| 3296/3348 [11:34:58<14:23, 16.60s/it] 98%|█████████▊| 3297/3348 [11:35:12<13:29, 15.87s/it] 99%|█████████▊| 3298/3348 [11:35:24<12:10, 14.61s/it] 99%|█████████▊| 3299/3348 [11:35:34<10:46, 13.19s/it] 99%|█████████▊| 3300/3348 [11:35:41<09:14, 11.55s/it]                                                      {'loss': 0.8346, 'learning_rate': 0.0002832820197044335, 'epoch': 2.96}
- 99%|█████████▊| 3300/3348 [11:35:41<09:14, 11.55s/it] 99%|█████████▊| 3301/3348 [11:35:48<07:49,  9.98s/it]
+ 99%|█████████▊| 3300/3348 [11:35:41<09:14, 11.55s/it] 99%|█████████▊| 3301/3348 [11:35:48<07:49,  9.98s/it] 99%|█████████▊| 3302/3348 [11:36:13<11:17, 14.74s/it] 99%|█████████▊| 3303/3348 [11:36:29<11:09, 14.88s/it] 99%|█████████▊| 3304/3348 [11:36:41<10:19, 14.07s/it] 99%|█████████▊| 3305/3348 [11:36:51<09:16, 12.94s/it] 99%|█████████▊| 3306/3348 [11:37:00<08:06, 11.59s/it] 99%|█████████▉| 3307/3348 [11:37:06<06:55, 10.13s/it] 99%|█████████▉| 3308/3348 [11:37:36<10:42, 16.06s/it] 99%|█████████▉| 3309/3348 [11:37:52<10:29, 16.13s/it] 99%|█████████▉| 3310/3348 [11:38:05<09:29, 14.99s/it]                                                      {'loss': 0.8618, 'learning_rate': 0.0002832820197044335, 'epoch': 2.97}
+ 99%|█████████▉| 3310/3348 [11:38:05<09:29, 14.99s/it] 99%|█████████▉| 3311/3348 [11:38:15<08:23, 13.61s/it] 99%|█████████▉| 3312/3348 [11:38:24<07:20, 12.24s/it] 99%|█████████▉| 3313/3348 [11:38:31<06:12, 10.64s/it] 99%|█████████▉| 3314/3348 [11:38:46<06:46, 11.94s/it] 99%|█████████▉| 3315/3348 [11:39:04<07:35, 13.79s/it] 99%|█████████▉| 3316/3348 [11:39:17<07:15, 13.62s/it] 99%|█████████▉| 3317/3348 [11:39:28<06:38, 12.85s/it] 99%|█████████▉| 3318/3348 [11:39:38<05:54, 11.80s/it] 99%|█████████▉| 3319/3348 [11:39:46<05:06, 10.58s/it] 99%|█████████▉| 3320/3348 [11:39:51<04:13,  9.07s/it]                                                      {'loss': 0.8619, 'learning_rate': 0.0002832820197044335, 'epoch': 2.97}
+ 99%|█████████▉| 3320/3348 [11:39:51<04:13,  9.07s/it] 99%|█████████▉| 3321/3348 [11:40:27<07:39, 17.01s/it] 99%|█████████▉| 3322/3348 [11:40:41<07:01, 16.19s/it] 99%|█████████▉| 3323/3348 [11:40:53<06:10, 14.83s/it] 99%|█████████▉| 3324/3348 [11:41:03<05:20, 13.35s/it] 99%|█████████▉| 3325/3348 [11:41:11<04:32, 11.83s/it] 99%|█████████▉| 3326/3348 [11:41:17<03:41, 10.09s/it] 99%|█████████▉| 3327/3348 [11:41:44<05:21, 15.32s/it] 99%|█████████▉| 3328/3348 [11:41:59<05:04, 15.23s/it] 99%|█████████▉| 3329/3348 [11:42:12<04:32, 14.33s/it] 99%|█████████▉| 3330/3348 [11:42:22<03:55, 13.10s/it]                                                      {'loss': 0.8124, 'learning_rate': 0.0002832820197044335, 'epoch': 2.98}
+ 99%|█████████▉| 3330/3348 [11:42:22<03:55, 13.10s/it] 99%|█████████▉| 3331/3348 [11:42:31<03:22, 11.89s/it]100%|█████████▉| 3332/3348 [11:42:37<02:43, 10.23s/it]100%|█████████▉| 3333/3348 [11:42:56<03:13, 12.88s/it]100%|█████████▉| 3334/3348 [11:43:13<03:17, 14.09s/it]100%|█████████▉| 3335/3348 [11:43:26<02:57, 13.65s/it]100%|█████████▉| 3336/3348 [11:43:37<02:33, 12.79s/it]100%|█████████▉| 3337/3348 [11:43:46<02:07, 11.62s/it]100%|█████████▉| 3338/3348 [11:43:53<01:42, 10.28s/it]100%|█████████▉| 3339/3348 [11:44:14<02:03, 13.74s/it]100%|█████████▉| 3340/3348 [11:44:33<02:01, 15.18s/it]                                                      {'loss': 0.8401, 'learning_rate': 0.0002832820197044335, 'epoch': 2.99}
+100%|█████████▉| 3340/3348 [11:44:33<02:01, 15.18s/it]100%|█████████▉| 3341/3348 [11:44:46<01:42, 14.59s/it]100%|█████████▉| 3342/3348 [11:44:58<01:22, 13.69s/it]100%|█████████▉| 3343/3348 [11:45:07<01:02, 12.47s/it]100%|█████████▉| 3344/3348 [11:45:15<00:43, 10.99s/it]100%|█████████▉| 3345/3348 [11:45:20<00:27,  9.30s/it]100%|█████████▉| 3346/3348 [11:45:44<00:27, 13.57s/it]100%|█████████▉| 3347/3348 [11:45:56<00:13, 13.21s/it]100%|██████████| 3348/3348 [11:46:06<00:00, 12.03s/it]                                                      {'train_runtime': 42366.4791, 'train_samples_per_second': 10.117, 'train_steps_per_second': 0.079, 'train_loss': 0.8526925022314383, 'epoch': 3.0}
+100%|██████████| 3348/3348 [11:46:06<00:00, 12.03s/it]100%|██████████| 3348/3348 [11:46:06<00:00, 12.65s/it]
+Adapter model saved successfully!Adapter model saved successfully!
+
+Adapter model saved successfully!
+Adapter model saved successfully!
+Adapter model saved successfully!Adapter model saved successfully!
+
+Adapter model saved successfully!
+Adapter model saved successfully!
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/peft/tuners/lora/bnb.py:67: UserWarning: Merge lora module to 8-bit linear may get different generations due to rounding errors.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/peft/tuners/lora/bnb.py:67: UserWarning: Merge lora module to 8-bit linear may get different generations due to rounding errors.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/peft/tuners/lora/bnb.py:67: UserWarning: Merge lora module to 8-bit linear may get different generations due to rounding errors.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/peft/tuners/lora/bnb.py:67: UserWarning: Merge lora module to 8-bit linear may get different generations due to rounding errors.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/peft/tuners/lora/bnb.py:67: UserWarning: Merge lora module to 8-bit linear may get different generations due to rounding errors.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/peft/tuners/lora/bnb.py:67: UserWarning: Merge lora module to 8-bit linear may get different generations due to rounding errors.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/peft/tuners/lora/bnb.py:67: UserWarning: Merge lora module to 8-bit linear may get different generations due to rounding errors.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/peft/tuners/lora/bnb.py:67: UserWarning: Merge lora module to 8-bit linear may get different generations due to rounding errors.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/modeling_utils.py:1825: UserWarning: You are calling `save_pretrained` to a 8-bit converted model you may likely encounter unexepected behaviors. If you want to save 8-bit models, make sure to have `bitsandbytes>0.37.2` installed.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/modeling_utils.py:1825: UserWarning: You are calling `save_pretrained` to a 8-bit converted model you may likely encounter unexepected behaviors. If you want to save 8-bit models, make sure to have `bitsandbytes>0.37.2` installed.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/modeling_utils.py:1825: UserWarning: You are calling `save_pretrained` to a 8-bit converted model you may likely encounter unexepected behaviors. If you want to save 8-bit models, make sure to have `bitsandbytes>0.37.2` installed.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/modeling_utils.py:1825: UserWarning: You are calling `save_pretrained` to a 8-bit converted model you may likely encounter unexepected behaviors. If you want to save 8-bit models, make sure to have `bitsandbytes>0.37.2` installed.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/modeling_utils.py:1825: UserWarning: You are calling `save_pretrained` to a 8-bit converted model you may likely encounter unexepected behaviors. If you want to save 8-bit models, make sure to have `bitsandbytes>0.37.2` installed.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/modeling_utils.py:1825: UserWarning: You are calling `save_pretrained` to a 8-bit converted model you may likely encounter unexepected behaviors. If you want to save 8-bit models, make sure to have `bitsandbytes>0.37.2` installed.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/modeling_utils.py:1825: UserWarning: You are calling `save_pretrained` to a 8-bit converted model you may likely encounter unexepected behaviors. If you want to save 8-bit models, make sure to have `bitsandbytes>0.37.2` installed.
+  warnings.warn(
+/hpc2hdd/home/jjiang472/.conda/envs/llms_latest/lib/python3.10/site-packages/transformers/modeling_utils.py:1825: UserWarning: You are calling `save_pretrained` to a 8-bit converted model you may likely encounter unexepected behaviors. If you want to save 8-bit models, make sure to have `bitsandbytes>0.37.2` installed.
+  warnings.warn(
+Merged model saved successfully!
+
+ If there's a warning about missing keys above, please disregard :)
+Merged model saved successfully!
+
+ If there's a warning about missing keys above, please disregard :)
+Merged model saved successfully!
+
+ If there's a warning about missing keys above, please disregard :)
+Merged model saved successfully!
+
+ If there's a warning about missing keys above, please disregard :)
+Merged model saved successfully!
+
+ If there's a warning about missing keys above, please disregard :)
+Merged model saved successfully!
+
+ If there's a warning about missing keys above, please disregard :)
+Merged model saved successfully!
+
+ If there's a warning about missing keys above, please disregard :)
+Merged model saved successfully!
+
+ If there's a warning about missing keys above, please disregard :)
