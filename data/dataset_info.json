@@ -1,0 +1,11 @@
+{
+  "wizardlm_evol_instruct": {
+    "file_name": "wizardlm_evol_instruct_v2_143k.json"
+  },
+  "metamathqa": {
+    "file_name": "metamathqa_395k.json"
+  },
+  "evol_codealpaca": {
+    "file_name": "evol_codealpaca_v1_111k.json"
+  }
+}
