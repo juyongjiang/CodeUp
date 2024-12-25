@@ -10,24 +10,21 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Table of Contents
-- [CodeUp: A Multilingual Code Generation Llama-X Model with Parameter-Efficient Instruction-Tuning](#codeup-a-multilingual-code-generation-llama-x-model-with-parameter-efficient-instruction-tuning)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Dataset Preparation](#dataset-preparation)
-  - [Prompt Template](#prompt-template)
-  - [Fine-tuning](#fine-tuning)
-  - [Evaluation](#evaluation)
-  - [Useful Resources](#useful-resources)
-    - [LLMs](#llms)
-    - [CPU Running](#cpu-running)
-    - [Interface](#interface)
-    - [Dataset](#dataset)
-    - [Evaluation](#evaluation-1)
-    - [Hugging Face](#hugging-face)
-    - [Papers](#papers)
-  - [Citation](#citation)
-  - [Star History](#star-history)
-
+- [Overview](#overview)
+- [Dataset Preparation](#dataset-preparation)
+- [Prompt Template](#prompt-template)
+- [Fine-tuning](#fine-tuning)
+- [Evaluation](#evaluation)
+- [Useful Resources](#useful-resources)
+  - [LLMs](#llms)
+  - [CPU Running](#cpu-running)
+  - [Interface](#interface)
+  - [Dataset](#dataset)
+  - [Evaluation](#evaluation-1)
+  - [Hugging Face](#hugging-face)
+  - [Papers](#papers)
+- [Citation](#citation)
+- [Star History](#star-history)
 
 ## Overview
 In recent years, large language models (LLMs) have demonstrated exceptional capabilities across a wide range of applications, largely due to their remarkable emergent abilities. To better align these models with human preferences, techniques such as instruction-tuning and reinforcement learning from human feedback (RLHF) have been developed for chat-based LLMs, including models like ChatGPT and GPT-4. However, except for Codex, these general-purpose LLMs primarily focus on general domains and are not specifically optimized for coding tasks. Codex, while a viable option, is a closed-source model developed by OpenAI. This underscores the need for developing open-source, instruction-following LLMs tailored to the code domain.
@@ -89,7 +86,7 @@ cd LLaMA-Factory
 pip install -e ".[torch,metrics]"
 ```
 
-Then,
+Then, run the following commands:
 
 ```bash
 # 1. instruction-following
@@ -144,7 +141,7 @@ pip install --force-reinstall -v "numpy==1.25.2" -i https://pypi.tuna.tsinghua.e
 pip install --upgrade "transformers>=4.45" -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
-Then,
+Then, run the following commands:
 
 ```bash
 bash run_eval_codeup.sh 2>&1 | tee train_codeup.log
