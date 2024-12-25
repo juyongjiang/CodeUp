@@ -105,7 +105,7 @@ llamafactory-cli export codeup/llama3_lora_sft_merge_code.yaml
 or 
 
 ```bash
-bash run_train_codeup.sh
+bash run_train_codeup.sh 2>&1 | tee train_codeup.log
 ```
 
 
@@ -144,7 +144,7 @@ pip install --upgrade "transformers>=4.45" -i https://pypi.tuna.tsinghua.edu.cn/
 Then, run the following commands:
 
 ```bash
-bash run_eval_codeup.sh 2>&1 | tee train_codeup.log
+bash run_eval_codeup.sh
 ```
 
 The batch inference using [vLLM](https://docs.vllm.ai/en/latest/) can significantly speed up the evaluation. The greedy decoding strategy will be adopted and can be completed within 20 seconds.
